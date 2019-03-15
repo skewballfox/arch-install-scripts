@@ -22,7 +22,10 @@ pacman -Su --noconfirm firejail usbguard chrony xorg-server
 systemctl disable systemd-timesyncd.service
 systemctl enable chronyd.service
 
+sed -i "/umask"'s/^022/0077//' /etc/profile
 
 sed -i "/\[multilib\]/,/Include/"'s/^#//' /etc/pacman.conf
 
 pacman -Syyu --noconfirm mesa lib32-mesa
+
+chmod 700 /boot /etc/{iptables,arptables}

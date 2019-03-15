@@ -2,8 +2,10 @@
 git clone https://aur.archlinux.org/yay.git
 cd yay
 makepkg -sicL
+
 install='yay -Sya --nocombinedupgrade --noconfirm --sudoloop android-studio-beta android-sdk android-docs'
 install+=' rstudio-desktop-bin oh-my-zsh-git oh-my-zsh-powerline-theme-git spotify-dev drive-bin'
+install+=' ruby-taskwarrior-web zotero-beta android-sdk-platform-tools discord-canary'
 
 eval $install
 
@@ -19,12 +21,16 @@ newgrp sdkusers
 drive init gdrive
 cd gdrive
 drive pull --quiet Classes
-drive pull --quiet bookmarks.db
+drive pull --quiet .buku_db
 drive pull --quiet Library
 drive pull --quiet Docs
-
+drive pull --quiet .task
 
 cd ~
+
+mkdir .local/share/buku
+ln -s ~/gdrive/.buku_db/bookmarks.db ~/.local/share/buku/bookmarks.db
+
 echo ".cfg">> .gitignore
 alias config='/usr/bin/git --git-dir=$HOME/.cfg/ --work-tree=$HOME'
 git clone --bare https://github.com/skewballfox/.cfg.git $HOME/.cfg
