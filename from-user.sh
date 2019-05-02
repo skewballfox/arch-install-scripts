@@ -3,9 +3,19 @@ git clone https://aur.archlinux.org/yay.git
 cd yay
 makepkg -sicL
 
-install='yay -Sya --nocombinedupgrade --noconfirm --sudoloop android-studio-beta android-sdk android-docs'
-install+=' rstudio-desktop-bin oh-my-zsh-git oh-my-zsh-powerline-theme-git spotify-dev drive-bin'
-install+=' ruby-taskwarrior-web zotero-beta android-sdk-platform-tools discord-canary'
+install='yay -Sya --nocombinedupgrade --noconfirm --sudoloop'
+# for working with android projects via android studio
+install+=' android-studio-beta android-sdk android-docs android-sdk-platform-tools'
+# a few installs for making this build unixporn worthy
+install+=' i3lock-fancy-git oh-my-zsh-git oh-my-zsh-powerline-theme-git'
+# for accessing useful social accounts
+install+=' spotify-dev discord-canary'
+# for interfacing with cloud services and personal libraries
+install+=' drive-bin buku ruby-taskwarrior-web'
+# for using git with pass
+install+=' pass-git-helper-git'
+# why isn't this in available via the official repositories?
+install+=' rstudio-desktop-bin'
 
 eval $install
 
@@ -27,6 +37,10 @@ drive pull --quiet Docs
 drive pull --quiet .task
 
 cd ~
+
+#to use pass in order to reduce the need for supplying credentials
+git config --global credential.helper /usr/bin/pass-git-helper
+
 
 mkdir .local/share/buku
 ln -s ~/gdrive/.buku_db/bookmarks.db ~/.local/share/buku/bookmarks.db

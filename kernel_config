@@ -1,0 +1,1 @@
+pacman -Su linux-hardened linux-zen crda usbctl
