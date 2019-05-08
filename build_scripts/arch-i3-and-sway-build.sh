@@ -21,7 +21,7 @@ build+=' xbacklight alsa-utils pulseaudio pulseaudio-alsa pulseaudio-bluetooth l
 
 #python tools and libraries, and r
 build+=' python-numpy python-matplotlib python-selenium python-requests python-beautifulsoup4'
-build+=' python-sympy ipython jupyter-notebook opencv geckodriver r'
+build+=' python-sympy python-pip ipython jupyter-notebook opencv geckodriver r'
 
 #for linting python and bash
 build+=' bash-language-server python-pylint python-language-server python-pyflakes yapf'
