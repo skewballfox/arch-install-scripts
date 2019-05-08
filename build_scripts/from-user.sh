@@ -13,7 +13,7 @@ install+=' i3lock-fancy-git oh-my-zsh-git oh-my-zsh-powerline-theme-git'
 # for accessing useful social accounts
 install+=' spotify-dev discord-canary'
 # for interfacing with cloud services and personal libraries
-install+=' drive-bin buku ruby-taskwarrior-web'
+install+=' drive-bin buku bukubrow ruby-taskwarrior-web'
 # for using git with pass
 install+=' pass-git-helper-git'
 # why isn't this in available via the official repositories?

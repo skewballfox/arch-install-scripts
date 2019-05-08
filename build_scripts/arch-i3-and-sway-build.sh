@@ -33,6 +33,9 @@ build+=' xscreensaver compton dmenu redshift'
 #for editing video and image formats
 build+=' blender gimp'
 
+#for spellchecking
+build+=' hunspell hunspell-en_US'
+
 #for working with mysql databases
 build+=' mariadb mysqlworkbench'
 
