@@ -3,6 +3,8 @@ git clone https://aur.archlinux.org/yay.git
 cd yay
 makepkg -sicL
 
+sudo firecfg
+
 install='yay -Sya --nocombinedupgrade --noconfirm --sudoloop'
 # for working with android projects via android studio
 install+=' android-studio-beta android-sdk android-docs android-sdk-platform-tools'
@@ -16,6 +18,8 @@ install+=' drive-bin buku ruby-taskwarrior-web'
 install+=' pass-git-helper-git'
 # why isn't this in available via the official repositories?
 install+=' rstudio-desktop-bin'
+# to customize gdm
+install+=' gdm3setup-utils'
 
 eval $install
 

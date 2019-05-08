@@ -19,6 +19,8 @@ EDITOR=nano visudo
 passwd -l root
 pacman -Su --noconfirm firejail usbguard chrony xorg-server
 
+
+
 systemctl disable systemd-timesyncd.service
 systemctl enable chronyd.service
 

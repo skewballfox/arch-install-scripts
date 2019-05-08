@@ -1,7 +1,8 @@
-build='pacman -Syyu --noconfirm i3-wm xorg-xrdb'
+#this is a build for i3 and sway, to allow for easy navigation between x and wayland
+build='pacman -Syyu --noconfirm i3-wm sway xorg-xrdb'
 
-#for session login, will be replaced later to improve security
-build+=' lightdm lightdm-gtk-greeter lightdm-gtk-greeter-settings'
+#for session login xorg-xinit is added so that rootless xorg can be configured
+build+='xorg-xinit lightdm lightdm-gtk-greeter lightdm-gtk-greeter-settings'
 
 #just fonts
 build+=' ttf-font-awesome ttf-fira-code font-mathematica noto-fonts-cjk noto-fonts-emoji'

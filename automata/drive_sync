@@ -1,0 +1,5 @@
+#!/bin/bash
+
+gdrive_path=$HOME
+echo "$gdrive_path/gdrive"
+ls "$gdrive_path/gdrive"
