@@ -36,10 +36,19 @@ vga_driver=$(lspci | grep 'vga\|3d\|2d')
 if [[ $vga == *"Intel"* ]]; then
     pacman -Syyu --noconfirm mesa lib32-mesa
 elif [[ $vga == *"Nvidia"* ]]; then
-    pacman -Syyu --noconfirm nvidia-dkms lib32-nvidia-utils
+    pacman -Syyu --noconfirm nvidia-dkms lib32-nvidia-utils nvidia-settings
 fi
-done
 
 pacman -Syyu --noconfirm mesa lib32-mesa
+
+# the following lines detect if it is a laptop, then writes a file disabling
+# waking up if lid is opened.
+
+read -r chassis_type < /sys/class/dmi/id/chassis_type
+
+if [[$chassis_type -eq 9]] || [[$chassis_type -eq 10]]; then
+  echo 'w /proc/acpi/wakeup - - - - LID' >> etc/tmpfiles.d/disable-lid-wakeup.conf
+fi
+
 
 chmod 700 /boot /etc/{iptables,arptables}

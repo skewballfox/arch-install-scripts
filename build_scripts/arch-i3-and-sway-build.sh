@@ -8,7 +8,7 @@ build+='gdm polkit polkit-gnome'
 build+=' ttf-font-awesome ttf-fira-code font-mathematica noto-fonts-cjk noto-fonts-emoji'
 
 #common applications
-build+=' firefox chromium mpv qbittorrent caprine okular phonon-qt5-gstreamer'
+build+=' firefox-developers-edition chromium mpv qbittorrent caprine zathura'
 
 #for linux magic
 build+='rxvt-unicode task zsh autocutsel ranger wget'
