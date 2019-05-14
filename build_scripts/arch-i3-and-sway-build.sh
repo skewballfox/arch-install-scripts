@@ -52,7 +52,7 @@ build+=' pandoc texlive-core'
 build+=' networkmanager network-manager-applet blueman'
 
 #For browsing files and controlling USBs
-build+=' thunar thunar-volman gvfs gparted'
+build+=' thunar thunar-volman gvfs gparted ntfs-3g'
 
 #For desktop wallpaper, system notifications, and information display
 build+=' feh dunst conky conky-manager'
@@ -62,6 +62,9 @@ build+=' scrot imagemagick wmctrl'
 
 #for improving password security for the programs I write
 build+=' gnupg pass'
+
+# for my zsh setup
+build+=' pkgfile zsh-completions zsh-syntax-highlighting'
 
 eval $build
 

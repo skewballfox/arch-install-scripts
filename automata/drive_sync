@@ -1,5 +1,9 @@
 #!/bin/bash
 
-gdrive_path=$HOME
-echo "$gdrive_path/gdrive"
-ls "$gdrive_path/gdrive"
+gdrive_path="$HOME/gdrive/"
+
+for D in $gdrive_path*; do
+    if [ -d "${D}" ]; then
+        drive push -no-prompt $D   # your processing here
+    fi
+done

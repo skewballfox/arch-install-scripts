@@ -60,6 +60,8 @@ build+=' scrot imagemagick wmctrl'
 #for improving password security for the programs I write
 build+=' gnupg pass'
 
+#extremely useful utilities
+build+=' pkgfile'
 eval $build
 
 #this makes java use system anti-aliased fonts and make swing use the GTK look and feel
