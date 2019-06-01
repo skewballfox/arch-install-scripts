@@ -26,6 +26,8 @@ eval $install
 cd ~
 rm -r yay
 
+git config --global credential.helper /usr/bin/pass-git-helper
+
 sudo groupadd sdkusers
 sudo gpasswd -a daedalus sdkusers
 sudo chown -R :sdkusers /opt/android-sdk/
