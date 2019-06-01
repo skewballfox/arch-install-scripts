@@ -1,3 +1,5 @@
+git config --global user.email "joshua.ferguson.273@gmail.com"
+git config --global user.name "skewballfox"
 
 git clone https://aur.archlinux.org/yay.git
 cd yay
