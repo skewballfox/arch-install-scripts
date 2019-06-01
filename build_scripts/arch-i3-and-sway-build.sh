@@ -2,19 +2,30 @@
 build='pacman -Syyu --noconfirm i3-wm sway xorg-xrdb'
 
 #for session login, gdm is used for wayland xorg compatibility, gnome polkit is used for compatibility
-build+='gdm polkit polkit-gnome'
+#right now just setting it up, but I may want to change the startup conf
+#on an nvidia system in order to run xorg rootless
+if [[ $vga == *"Intel"* ]]; then
+    build+=' gdm polkit polkit-gnome'
+    # wayland setup
+    build+=' termite mako slurp grim bemenu'
+elif [[ $vga == *"Nvidia"* ]]; then
+    build+='gdm polkit polkit-gnome'
+fi
+# kernel stuff
+build+=' linux-hardened linux-zen linux-zen-headers linux-hardened-headers crda usbctl'
 
 #just fonts
-build+=' ttf-font-awesome ttf-fira-code font-mathematica noto-fonts-cjk noto-fonts-emoji'
+build+=' ttf-font-awesome ttf-fira-code font-mathematica noto-fonts-cjk noto-fonts-emoji texlive-most'
 
 #common applications
-build+=' firefox-developers-edition chromium mpv qbittorrent caprine zathura'
+build+=' firefox-developers-edition chromium mpv qbittorrent caprine zathura zathura-pdf-poppler zathura-djvu'
+build+=' zathura-ps zathura-cb playonlinux wine winetricks wine_gecko wine-mono'
 
 #for linux magic
-build+='rxvt-unicode task zsh autocutsel ranger wget'
+build+='rxvt-unicode task zsh autocutsel ranger wget unrar dialog arch-wiki-lite'
 
 #for coding
-build+=' atom code apm git cmake zeal'
+build+=' code git cmake zeal kakoune'
 
 #for hardware function keys and interfacing
 build+=' xbacklight alsa-utils pulseaudio pulseaudio-alsa pulseaudio-bluetooth libpulse'
@@ -43,7 +54,8 @@ build+=' mariadb mysqlworkbench'
 build+=' jre-openjdk jdk-openjdk openjdk-doc'
 
 #for working with virtual machines
-build+=' virtualbox virtualbox-host-dkms linux-headers dkms virtualbox-guest-iso virtualbox-guest-utils '
+build+=' virtualbox virtualbox-host-dkms linux-headers dkms virtualbox-guest-iso virtualbox-guest-utils'
+build+=' virtualbox-guest-dkms'
 
 #for working with pandoc and resume project
 build+=' pandoc texlive-core'
@@ -64,7 +76,7 @@ build+=' scrot imagemagick wmctrl'
 build+=' gnupg pass'
 
 # for my zsh setup
-build+=' pkgfile zsh-completions zsh-syntax-highlighting'
+build+=' pkgfile zsh-completions zsh-syntax-highlighting zsh-theme-powerlevel9k'
 
 eval $build
 
@@ -72,4 +84,4 @@ eval $build
 echo "export _JAVA_OPTIONS='-Dawt.useSystemAAFontSettings=on -Dswing.aatext=true -Dswing.defaultlaf=com.sun.java.swing.plaf.gtk.GTKLookAndFeel'" >> /etc/profile.d/jre.sh
 
 systemctl enable bluetooth.service
-systemctl enable lightdm.service
+systemctl enable gdm.service

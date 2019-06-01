@@ -1,0 +1,23 @@
+#!/bin/bash
+
+# this is an automated script to keep forks updated with upstream
+# repositories
+
+# for more information visit these links:
+# https://help.github.com/en/articles/configuring-a-remote-for-a-fork
+# https://help.github.com/en/articles/syncing-a-fork
+
+OSP_path="$HOME/workspace/Open_Source_Projects"
+
+for D in $OSP_path*; do
+    if [ -d "${D}" ]; then
+        cd $D
+        # update local branch with changes from upstream
+        git fetch upstream
+        git checkout master
+        git merge upstream/master
+        # update fork on github with changes from upstream
+        git push 
+
+    fi
+done

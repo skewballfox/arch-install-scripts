@@ -39,7 +39,6 @@ elif [[ $vga == *"Nvidia"* ]]; then
     pacman -Syyu --noconfirm nvidia-dkms lib32-nvidia-utils nvidia-settings
 fi
 
-pacman -Syyu --noconfirm mesa lib32-mesa
 
 # the following lines detect if it is a laptop, then writes a file disabling
 # waking up if lid is opened.

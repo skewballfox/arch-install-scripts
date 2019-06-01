@@ -2,6 +2,7 @@ package_list=' goessner.mdmath redhat.java yzhang.markdown-all-in-one'
 package_list+=' ms-vscode.cpptools ms-python.python mblode.zotero'
 package_list+=' fcrespo82.markdown-table-formatter telesoho.vscode-markdown-paste-image'
 package_list+=' deerawan.vscode-dash njpwerner.autodocstring yzane.markdown-pdf coolbear.systemd-unit-file'
+package_list+=' brpaz.file-templates'
 
 cd github
 
