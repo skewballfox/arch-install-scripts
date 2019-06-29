@@ -4,28 +4,33 @@ build='pacman -Syyu --noconfirm i3-wm sway xorg-xrdb'
 #for session login, gdm is used for wayland xorg compatibility, gnome polkit is used for compatibility
 #right now just setting it up, but I may want to change the startup conf
 #on an nvidia system in order to run xorg rootless
+
 if [[ $vga == *"Intel"* ]]; then
     build+=' gdm polkit polkit-gnome'
     # wayland setup
-    build+=' termite mako slurp grim bemenu'
+    build+=' mako slurp grim bemenu'
 elif [[ $vga == *"Nvidia"* ]]; then
     build+='gdm polkit polkit-gnome'
 fi
+
 # kernel stuff
 build+=' linux-hardened linux-zen linux-zen-headers linux-hardened-headers crda usbctl'
 
 #just fonts
 build+=' ttf-font-awesome ttf-fira-code font-mathematica noto-fonts-cjk noto-fonts-emoji texlive-most'
+build+=' awesome-terminal-fonts'
 
 #common applications
 build+=' firefox-developers-edition chromium mpv qbittorrent caprine zathura zathura-pdf-poppler zathura-djvu'
-build+=' zathura-ps zathura-cb playonlinux wine winetricks wine_gecko wine-mono'
+build+=' zathura-ps zathura-cb playonlinux wine winetricks wine_gecko wine-mono libreoffice-fresh'
+build+=' anki'
 
 #for linux magic
-build+='rxvt-unicode task zsh autocutsel ranger wget unrar dialog arch-wiki-lite'
+build+='tmux termite rxvt-unicode task zsh autocutsel wget unrar dialog arch-wiki-lite w3m'
+build+=' youtube-dl'
 
 #for coding
-build+=' code git cmake zeal kakoune'
+build+=' code git cmake zeal kakoune meson ninja'
 
 #for hardware function keys and interfacing
 build+=' xbacklight alsa-utils pulseaudio pulseaudio-alsa pulseaudio-bluetooth libpulse'
@@ -33,16 +38,18 @@ build+=' xbacklight alsa-utils pulseaudio pulseaudio-alsa pulseaudio-bluetooth l
 #python tools and libraries, and r
 build+=' python-numpy python-matplotlib python-selenium python-requests python-beautifulsoup4'
 build+=' python-sympy python-pip ipython jupyter-notebook opencv geckodriver r'
+build+=' buildbot python-buildbot-www python-buildbot-console-view python-xdg'
 
 #for linting python and bash
 build+=' bash-language-server python-pylint python-language-server python-pyflakes yapf'
 build+=' python-mccabe python-pycodestyle python-pydocstyle python-rope'
 
+
 #for making i3 closer to a full fledged desktop environment
 build+=' xscreensaver compton dmenu redshift'
 
-#for editing video and image formats
-build+=' blender gimp'
+#for recording and editing editing video and image formats
+build+=' cheese blender gimp'
 
 #for spellchecking
 build+=' hunspell hunspell-en_US'
@@ -64,7 +71,7 @@ build+=' pandoc texlive-core'
 build+=' networkmanager network-manager-applet blueman'
 
 #For browsing files and controlling USBs
-build+=' thunar thunar-volman gvfs gparted ntfs-3g'
+build+=' thunar ranger udiskie thunar-volman gvfs gparted ntfs-3g'
 
 #For desktop wallpaper, system notifications, and information display
 build+=' feh dunst conky conky-manager'
@@ -72,8 +79,8 @@ build+=' feh dunst conky conky-manager'
 #for screenshots and some locking
 build+=' scrot imagemagick wmctrl'
 
-#for improving password security for the programs I write
-build+=' gnupg pass'
+#for improving password security
+build+=' gnupg pass browserpass-firefox browserpass-chromium'
 
 # for my zsh setup
 build+=' pkgfile zsh-completions zsh-syntax-highlighting zsh-theme-powerlevel9k'
@@ -85,3 +92,4 @@ echo "export _JAVA_OPTIONS='-Dawt.useSystemAAFontSettings=on -Dswing.aatext=true
 
 systemctl enable bluetooth.service
 systemctl enable gdm.service
+

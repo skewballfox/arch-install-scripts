@@ -4,6 +4,6 @@ package_list+=' fcrespo82.markdown-table-formatter telesoho.vscode-markdown-past
 package_list+=' deerawan.vscode-dash njpwerner.autodocstring yzane.markdown-pdf coolbear.systemd-unit-file'
 package_list+=' brpaz.file-templates'
 
-cd github
+cd workspace
 
 wget https://github.com/retorquere/zotero-better-bibtex/releases/download/v5.1.60/zotero-better-bibtex-5.1.60.xpi
