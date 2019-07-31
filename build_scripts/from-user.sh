@@ -6,10 +6,15 @@ cd yay
 makepkg -sicL
 cd ~
 rm -r yay
+#uncomment command write server list to file 
+#add server list to etc/powerpill/powerpill.json rsync server section
 
+#reflector -p rsync -f 7 -l 7
+
+#make directory so zathura can save bookmarks
+mkdir .local/share/zathura
 #set default directories
 
-sudo firecfg
 
 install='yay -Sya --nocombinedupgrade --noconfirm --sudoloop'
 # for working with android projects via android studio
@@ -24,6 +29,8 @@ install+=' pass-git-helper-git'
 install+=' rstudio-desktop-bin'
 # to check java style with kak
 install+=' checkstyle'
+# firefox hardening
+install+=' firefox-hardening hardened-malloc-git'
 
 eval $install
 
@@ -52,6 +59,7 @@ echo ".cfg">> .gitignore
 alias config='/usr/bin/git --git-dir=$HOME/.cfg/ --work-tree=$HOME'
 git clone --bare https://github.com/skewballfox/.cfg.git $HOME/.cfg
 
+#add git directory for firefox, set to setup firefox here
 
 config checkout -f
 
@@ -84,3 +92,5 @@ sudo gpasswd -a daedalus sdkusers
 sudo chown -R :sdkusers /opt/android-sdk/
 sudo chmod -R g+w /opt/android-sdk/
 newgrp sdkusers
+
+sudo firecfg

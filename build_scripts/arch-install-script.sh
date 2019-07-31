@@ -9,6 +9,5 @@ pacstrap /mnt base-devel
 cp -r arch-install-scripts /mnt
 arch-chroot /mnt arch-install-scripts/arch-post-chroot.sh
 
-#shift control to post-chroot
 
 #unmount all and reboot

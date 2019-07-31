@@ -18,17 +18,23 @@ echo '127.0.0.1 localhost' >> etc/hosts
 echo '::1      localhost' >> etc/hosts
 echo '127.0.1.1 labyrinth.localdomain labyrinth' >> etc/hosts
 
-#populate pacman keyring
-pacman-key --init
-pacman-key --populate archlinux
-
 #set pacman options
+
 #enable color and candy
 sed -i '/Color/s/^#//' etc/pacman.conf
-sed -i '/Color/a ILoveCandy' >> etc/pacman.conf
+sed -i '/Color/a ILoveCandy' etc/pacman.conf
+
 
 #enable multilib repository
 sed -i "/\[multilib\]/,/Include/"'s/^#//' etc/pacman.conf
+
+#set package signing option to require signature. 
+sed -i '/\[core\]/a SigLevel\ =\ PackageRequired' etc/pacman.conf
+
+
+#populate pacman keyring
+pacman-key --init
+pacman-key --populate archlinux
 
 #wrap in if statement, have seperate setups for grub and rEFInd
 pacman -Su --noconfirm grub os-prober
@@ -67,6 +73,8 @@ elif [[ $vga == *"Nvidia"* ]]; then
 fi
 
 #control is passed to the i3wm build script
+#working on controlling entire process from user script.
+
 source ./arch-i3-and-sway-build.sh
 wait $!
 

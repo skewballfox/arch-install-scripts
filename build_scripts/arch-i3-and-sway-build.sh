@@ -21,7 +21,7 @@ build+=' ttf-font-awesome ttf-fira-code font-mathematica noto-fonts-cjk noto-fon
 build+=' awesome-terminal-fonts'
 
 #common applications
-build+=' firefox-developers-edition chromium mpv qbittorrent caprine zathura zathura-pdf-poppler zathura-djvu'
+build+=' firefox-developers-edition chromium mpv qbittorrent caprine zathura zathura-pdf-mupdf mupdf-tools zathura-djvu'
 build+=' zathura-ps zathura-cb playonlinux wine winetricks wine_gecko wine-mono libreoffice-fresh'
 build+=' anki'
 
