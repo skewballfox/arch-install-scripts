@@ -1,44 +1,77 @@
+################ Setup git credentials #################
+########################################################
+
+sudo pacman -S git
+
 git config --global user.email "joshua.ferguson.273@gmail.com"
 git config --global user.name "Joshua Ferguson"
- 
+
+############### Setup Dotfiles #########################
+########################################################
+
+echo ".cfg">> .gitignore
+alias config='git --git-dir=$HOME/.cfg/ --work-tree=$HOME'
+git clone --bare https://github.com/skewballfox/.cfg.git $HOME/.cfg 
+
+config checkout -f
+
+config config --local status.showUntrackedFiles no
+
+############## Source package installers ###############
+########################################################
+
+#yay: my current aur helper, may move to baurerpill
+
 git clone https://aur.archlinux.org/yay.git
 cd yay
 makepkg -sicL
 cd ~
 rm -r yay
+
+#powerpill: what I want to move this script to in the future, for improved install speed
+
+git clone https://aur.archlinux.org/powerpill.git
+cd powerpill
+makepkg -sicL
+cd ~
+rm -r powerpill
+
+#test and add buarpill
+
+
 #uncomment command write server list to file 
 #add server list to etc/powerpill/powerpill.json rsync server section
 
 #reflector -p rsync -f 7 -l 7
 
-#make directory so zathura can save bookmarks
-mkdir .local/share/zathura
-#set default directories
+################### Install and setup Packages ###########
+##########################################################
 
+source package_lists/*
 
-install='yay -Sya --nocombinedupgrade --noconfirm --sudoloop'
-# for working with android projects via android studio
-install+=' android-studio-beta android-sdk android-docs android-sdk-platform-tools'
-# a few installs for making this build unixporn worthy
-install+=' i3lock-fancy-git oh-my-zsh-git oh-my-zsh-powerline-theme-git otf-nerd-fonts-fira-code'
-# for interfacing with cloud services and personal libraries
-install+=' drive-bin buku bukubrow'
-# for using git with pass
-install+=' pass-git-helper-git'
-# why isn't this in available via the official repositories?
-install+=' rstudio-desktop-bin'
-# to check java style with kak
-install+=' checkstyle'
-# firefox hardening
-install+=' firefox-hardening hardened-malloc-git'
-
-eval $install
-
-
+sudo pacman -S --noconfirm ${build_main[*]}
+yay -Sya --noconfirm --nocombinedupgrade --sudoloop ${build_aur[*]}
 
 # set up github to use pass
 git config --global credential.helper /usr/bin/pass-git-helper
 
+#make directory so zathura can save bookmarks
+mkdir .local/share/zathura
+
+#set default directories and filetypes
+xdg-mime default zathura.desktop application/pdf
+
+#this makes java use system anti-aliased fonts and make swing use the GTK look and feel
+echo "export _JAVA_OPTIONS='-Dawt.useSystemAAFontSettings=on -Dswing.aatext=true -Dswing.defaultlaf=com.sun.java.swing.plaf.gtk.GTKLookAndFeel'" >> etc/profile.d/jre.sh
+
+################# Setup Code ############################
+#########################################################
+code --install-extension ${code_setup[*]}
+
+############### Setup Google drive ######################
+#########################################################
+
+#prompt for drive password
 
 drive init gdrive
 cd gdrive
@@ -55,15 +88,10 @@ cd ~
 mkdir .local/share/buku
 ln -s ~/gdrive/.buku_db/bookmarks.db ~/.local/share/buku/bookmarks.db
 
-echo ".cfg">> .gitignore
-alias config='/usr/bin/git --git-dir=$HOME/.cfg/ --work-tree=$HOME'
-git clone --bare https://github.com/skewballfox/.cfg.git $HOME/.cfg
-
 #add git directory for firefox, set to setup firefox here
 
-config checkout -f
-
-config config --local status.showUntrackedFiles no
+#################### Setup Workspace ################################
+#####################################################################
 
 mkdir workspace
 cd workspace
@@ -72,12 +100,7 @@ mkdir System_Tools
 mkdir Open_Source_Projects
 
 cd System_Tools
-git clone https://github.com/skewballfox/arch-install-scripts.git
-git clone https://github.com/skewballfox/writing_tools.git
-git clone https://github.com/skewballfox/Ankimation.git
-git clone https://github.com/skewballfox/pandoras_box.git
-git clone https://github.com/skewballfox/SauronsEye.git
-git clone https://github.com/skewballfox/USM_Calendar_Scraper.git
+
 
 cd writing_tools
 ./populate_systemd
@@ -87,10 +110,15 @@ cd ../Open_Source_Projects
 
 # look up open source projects. 
 
+############### Add groups for android development ##############
+#################################################################
+
 sudo groupadd sdkusers
 sudo gpasswd -a daedalus sdkusers
 sudo chown -R :sdkusers /opt/android-sdk/
 sudo chmod -R g+w /opt/android-sdk/
 newgrp sdkusers
 
-sudo firecfg
+################ exit and return control ########################
+#################################################################
+exit
