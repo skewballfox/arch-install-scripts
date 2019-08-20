@@ -41,15 +41,23 @@ rm -r powerpill
 
 #uncomment command write server list to file 
 #add server list to etc/powerpill/powerpill.json rsync server section
+reflector -p rsync -f 7 -l 7 >> temp 
+sed -i '/Server\ =/!d' temp
+sed -i 's/Server\ =\ //' temp
+sed -i 's/.*/"&"/' temp
+sed -i '$!s/$/,/' temp
+rslist=(cat temp)
 
-#reflector -p rsync -f 7 -l 7
+#could never get the following line working
+#sudo sed -i '/"servers":/s/\[.*\]/[$rslist]/' etc/powerpill/powerpill.json
+
 
 ################### Install and setup Packages ###########
 ##########################################################
 
 source package_lists/*
 
-sudo pacman -S --noconfirm ${build_main[*]}
+sudo pacaur -Syyu --noconfirm ${build_main[*]}
 yay -Sya --noconfirm --nocombinedupgrade --sudoloop ${build_aur[*]}
 
 # set up github to use pass
@@ -101,6 +109,7 @@ mkdir Open_Source_Projects
 
 cd System_Tools
 
+source /package_lists/git_system_tools.sh
 
 cd writing_tools
 ./populate_systemd

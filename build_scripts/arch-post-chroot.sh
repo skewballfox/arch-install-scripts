@@ -5,7 +5,8 @@ ln -sf usr/share/zoneinfo/US/Central etc/localtime
 hwclock --systohc
 
 # definitely change this 
-nano etc/locale.gen
+# nano etc/locale.gen
+sed -i '/#en_US.UTF-8\ UTF-8/s/^#//' etc/locale.gen
 locale-gen
 
 #set language options and keyboard
@@ -13,12 +14,13 @@ echo 'LANG=en_US.UTF-8' >>  etc/locale.conf
 loadkeys usr/share/kbd/keymaps/sun/sunt6-uk.map.gz
 echo 'KEYMAP=gb' >> etc/vconsole.conf
 
-#ask for hostname and set to variable
-echo 'labyrinth' >> etc/hostname
+
+read -p "Please enter a hostname: " HOSTNAME
+echo "$HOSTNAME" >> etc/hostname
 
 echo -e '127.0.0.1\t localhost' >> etc/hosts
 echo -e '::1\t localhost' >> etc/hosts
-echo -e'127.0.1.1\t labyrinth.localdomain\t labyrinth' >> etc/hosts
+echo -e '127.0.1.1\t labyrinth.localdomain\t labyrinth' >> etc/hosts
 
 # the following lines detect if it is a laptop, then writes a file disabling
 # waking up if lid is opened.
@@ -45,6 +47,9 @@ sed -i "/\[multilib\]/,/Include/"'s/^#//' etc/pacman.conf
 
 #set package signing option to require signature. 
 sed -i '/\[core\]/a SigLevel\ =\ PackageRequired' etc/pacman.conf
+sed -i '/\[multilib\]/a SigLevel\ =\ PackageRequired' etc/pacman.conf
+sed -i '/\[community\]/a SigLevel\ =\ PackageRequired' etc/pacman.conf
+sed -i '/\[extra\]/a SigLevel\ =\ PackageRequired' etc/pacman.conf
 
 #populate pacman keyring
 pacman-key --init
@@ -53,8 +58,12 @@ pacman-key --populate archlinux
 # install pacman hooks
 source ./pacman_hooks/hook_populator.sh
 
+#update the mirrorlist
+wget -O etc/pacman.d/mirrorlist https://www.archlinux.org/mirrorlist/?country=US&protocol=https&ip_version=4&ip_version=6&use_mirror_status=on
+sed -i 's/^#Server/Server/' etc/pacman.d/mirrorlist
+
 #install a few necessary packages for rest of build
-pacman -Su grub os-prober firejail git chrony xorg-server
+pacman -Su grub os-prober firejail git chrony xorg-server sudo
 
 ################ Setup Bootloader #################################
 ###################################################################
@@ -90,28 +99,30 @@ fi
 ###################################################################
 
 #ask for username
+read -p "Please enter your username: " USERNAME
 #ask for password
+read -sp "Please enter your user password: " PWD
 
 #enable wheel
 sed -i '/%wheel\ ALL=(ALL)\ ALL/s/^#//' etc/sudoers
 
-useradd -m -G wheel,games -s bin/zsh daedalus
+useradd -m -G wheel,games -s bin/zsh $USERNAME
 
 #mv necessary files/folders and change permissions
-mv -r package_lists home/daedalus/
-mv from-user.sh home/daedalus/
+mv -r package_lists home/$USERNAME/
+mv from-user.sh home/$USERNAME/
 
-# chmod -R 
-# su - daedalus -c
-# wait $!
+chown -R $USERNAME: home/$USERNAME/package_lists
+chown -R $USERNAME: home/$USERNAME/from-user.sh
+chmod -R u+rx home/$USERNAME/package_lists
+chomd -r u+rx home/$USERNAME/from-user.sh
+
+#call the build script from user
+su - $USERNAME -c home/$USERNAME/from-user.sh
+wait $!
 
 #disable root
 passwd -l root
-
-#install powerpill, could be used to really speed shit up, but I need to test it first
-# " && cd powerpill && makepkg -sicL && cd .. && rmdir powerpill"
-
-
 
 ##################### Systemd Setup ###############################
 ###################################################################
