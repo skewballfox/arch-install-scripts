@@ -58,6 +58,7 @@ pacman-key --populate archlinux
 # install pacman hooks
 source ./pacman_hooks/hook_populator.sh
 
+
 #update the mirrorlist
 wget -O etc/pacman.d/mirrorlist https://www.archlinux.org/mirrorlist/?country=US&protocol=https&ip_version=4&ip_version=6&use_mirror_status=on
 sed -i 's/^#Server/Server/' etc/pacman.d/mirrorlist
@@ -121,6 +122,9 @@ chomd -r u+rx home/$USERNAME/from-user.sh
 su - $USERNAME -c home/$USERNAME/from-user.sh
 wait $!
 
+rm -r home/$USERNAME/package_lists
+rm -r home/$USERNAME/from-user.sh
+
 #disable root
 passwd -l root
 
@@ -135,17 +139,17 @@ systemctl enable apparmor.service
 systemctl enable bluetooth.service
 systemctl enable gdm.service
 
-#control is passed to the i3wm build script
-#working on controlling entire process from user script.
-
-# source ./arch-i3-and-sway-build.sh
-# wait $!
-
 #################### Harden System ##############################
 #################################################################
 
 chmod 700 boot etc/{iptables,arptables}
 sed -i "/umask"'s/^0022/0077//' etc/profile
 
-#set user password here
 
+mv mnt/firejail_profiles/globals.local etc/firejail/globals.local
+#firejail apparmor integration
+apparmor_parser -r etc/apparmor.d/firejail-default
+
+#set user password here
+passwd $USERNAME
+exit

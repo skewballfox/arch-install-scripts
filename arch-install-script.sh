@@ -95,10 +95,14 @@ pacstrap /mnt base-devel
 cd arch-install-scripts
 cp -r build_scripts pacman_hooks polkit_rules systemd_units /mnt
 cd ..
+
+#begin install
 arch-chroot /mnt mnt/build_scripts/arch-post-chroot.sh
+wait $1
+
 
 ######################### Clean up and reboot ####################
 ##################################################################
 
-#remove build files
+rm /mnt/build/build_scripts
 #unmount all and reboot

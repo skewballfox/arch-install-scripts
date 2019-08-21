@@ -69,39 +69,33 @@ mkdir .local/share/zathura
 #set default directories and filetypes
 xdg-mime default zathura.desktop application/pdf
 
+mkdir gdrive
+
+mkdir media
+mkdir media/pictures
+mkdir media/videos
+mkdir media/music
+
+mkdir workspace
+mkdir workspace/templates
+
+xdg-user-dir-update --set DOCUMENTS $HOME/gdrive
+xdg-user-dir-update --set PICTURES $HOME/media/pictures
+xdg-user-dir-update --set VIDEOS $HOME/media/videos
+xdg-user-dir-update --set MUSIC $HOME/media/music
+xdg-user-dir-update --set TEMPLATES $HOME/workspace/templates
+
 #this makes java use system anti-aliased fonts and make swing use the GTK look and feel
 echo "export _JAVA_OPTIONS='-Dawt.useSystemAAFontSettings=on -Dswing.aatext=true -Dswing.defaultlaf=com.sun.java.swing.plaf.gtk.GTKLookAndFeel'" >> etc/profile.d/jre.sh
 
 ################# Setup Code ############################
 #########################################################
 code --install-extension ${code_setup[*]}
-
-############### Setup Google drive ######################
-#########################################################
-
-#prompt for drive password
-
-drive init gdrive
-cd gdrive
-drive pull --quiet Classes
-drive pull --quiet .buku_db
-drive pull --quiet Library
-drive pull --quiet Docs
-drive pull --quiet .task
-
-cd ~
-
-
-
-mkdir .local/share/buku
-ln -s ~/gdrive/.buku_db/bookmarks.db ~/.local/share/buku/bookmarks.db
-
 #add git directory for firefox, set to setup firefox here
 
 #################### Setup Workspace ################################
 #####################################################################
 
-mkdir workspace
 cd workspace
 
 mkdir System_Tools
@@ -127,6 +121,7 @@ sudo gpasswd -a daedalus sdkusers
 sudo chown -R :sdkusers /opt/android-sdk/
 sudo chmod -R g+w /opt/android-sdk/
 newgrp sdkusers
+
 
 ################ exit and return control ########################
 #################################################################
