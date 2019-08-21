@@ -7,7 +7,7 @@ while [[ "$skip_flag" != 1 ]]
 do
     read -p "Have the partitions already been set up?\n Type y(es) or n(o): " APart_Flag
     if [[ "$APart_Flag" == "y" || "$APart_Flag" == "yes"]] 
-    then {
+    then 
         #skip automated partition management
         if { -d /sys/firmware/efi/efivars} {
                     read -p "will this system be EFI-based?/n Type y(es) or n(o): " EFI_Flag
@@ -16,12 +16,15 @@ do
         }
         skip_flag=1
 
-    } elseif {$APart_Flag== "n" or $APart_Flag == "no"} {
+    elif [[ "$APart_Flag" == "n" or "$APart_Flag" == "no" ]]
+    then
         #begin automated partition management
         #####################################
-        while {$cont_flag!=1} {
+        while [[ $cont_flag!=1 ]]
+        do
             read -p "Do you want to zero the drive?\n Type y(es) or n(o): " Zero_Flag
-            if {$Zero_Flag == "y" || $Zero_Flag == "yes"} then {
+            if [[ "$Zero_Flag" == "y" || "$Zero_Flag" == "yes" ]] 
+            then
                 #zero out the drives
                 ###################
                 dd if=/dev/zero of=/dev/sda status=progress
@@ -29,57 +32,65 @@ do
                 
                 cont_flag=1
 
-            } elseif {$Zero_Flag == "n" or $Zero_Flag== "no"} then {
+            elif [[ "$Zero_Flag" == "n" or "$Zero_Flag" == "no" ]] 
+            then 
                 cont_flag=1
-            }else {
+            else
                 echo "Response not understood, Please try again"
-            }
-        }
+            fi
+        done
         cont_flag=0
-        while { $cont_flag!=1 } {
+        while [[ $cont_flag!=1 ]]
+        do
             # begin partiton creation
             #########################
-            while { $EFI_Flag == "empty" } {
-                if {-d /sys/firmware/efi/efivars} {
+            while [[ $EFI_Flag == "empty" ]] 
+            do
+                if [ -d /sys/firmware/efi/efivars ] 
+                then
                     read -p "EFI is supported, Do you want to Set it up?/n Type yes or no: " EFI_Flag
-                        if { $EFI_Flag != "yes" && $EFI_Flag != "no"} {
-                            EFI_Flag="empty"
-                        }
-                    } else {
-                        EFI_Flag="no"
-                    }
-
+                    if [[ "$EFI_Flag" != "yes" && "$EFI_Flag" != "no" ]] 
+                    then
+                        EFI_Flag="empty"
                 
-                if { $EFI_Flag== "no"} {
-                    #Generate MBR partition setup
-                    #############################
-                    sfdisk /dev/sda < /arch-install-scripts/build_scripts/partition_setups/mbr_sda.sfdisk
-                    sfdisk /dev/sdb < /arch-install-scripts/build_scripts/partition_setups/mbr_sdb.sfdisk
-                    mkswap /dev/sdb2 
-                    swapon /dev/sdb2
-                    mount /dev/sda1 /mnt
-                    mkdir /mnt/home
-                    mount /dev/sdb1 /mnt/home
-                }
-                elif { $EFI_Flag == "yes" }
-                {
-                    #Generate GPT partition setup
-                    #############################
-                    echo "coming back to this, not fully developed"
-                    reboot
-                }
-            }
-            # end partition creation
-            ########################
-        }
-        skip_flag=1
-        #end automated partition management
-        ###################################
-    } else {
-        echo "Response not understood, Please try again"
-    }
+                    else
+                    EFI_Flag="no"
+                    fi
 
+                fi
+            done
+
+            if [[ "$EFI_Flag" == "no" ]] 
+            then
+                #Generate MBR partition setup
+                #############################
+                sfdisk /dev/sda < /arch-install-scripts/build_scripts/partition_setups/mbr_sda.sfdisk
+                sfdisk /dev/sdb < /arch-install-scripts/build_scripts/partition_setups/mbr_sdb.sfdisk
+                mkswap /dev/sdb2 
+                swapon /dev/sdb2
+                mount /dev/sda1 /mnt
+                mkdir /mnt/home
+                mount /dev/sdb1 /mnt/home
+            
+            elif [[ "$EFI_Flag" == "yes" ]]
+            then
+                #Generate GPT partition setup
+                #############################
+                echo "coming back to this, not fully developed"
+                reboot
+            fi
+        done
+        # end partition creation
+        ########################
+    done
+    skip_flag=1
+    #end automated partition management
+    ###################################
+    else 
+        echo "Response not understood, Please try again"
+    fi
 done
+
 cont_flag=0
 
 
