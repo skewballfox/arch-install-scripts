@@ -6,16 +6,18 @@ This automates the building/recreation of my current setup in arch, both in term
 
 ## TODO
 
-prompt user for username, password, hostname, etc.
-
 use global environment variables to pass options between scripts
-
-setup at least partially automated partition management
 
 setup a few useful Virtual Machines
 
 Migrate to a custom Kernel
 
-setup global.local firejail rules to enable apparmor support
-
 use tmux to daemonize termite
+
+figure out how to update rsync server list in powerpill config
+
+explore battery saving options
+
+make the partition management a bit more flexible
+
+Find a way to sandbox x11 for Firefox while retaining the ability to control the window shape via i3wm (qubes managed to do this with xen virtualization)
