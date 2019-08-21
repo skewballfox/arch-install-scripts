@@ -3,9 +3,11 @@
 
 skip_flag=0
 EFI_Flag="empty"
-while {skip_flag!=1} {
+while [[ "$skip_flag" != 1 ]]
+do
     read -p "Have the partitions already been set up?\n Type y(es) or n(o): " APart_Flag
-    if {$APart_Flag == "y" || $APart_Flag == "yes"} {
+    if [[ "$APart_Flag" == "y" || "$APart_Flag" == "yes"]] 
+    then {
         #skip automated partition management
         if { -d /sys/firmware/efi/efivars} {
                     read -p "will this system be EFI-based?/n Type y(es) or n(o): " EFI_Flag
@@ -77,7 +79,7 @@ while {skip_flag!=1} {
         echo "Response not understood, Please try again"
     }
 
-}
+done
 cont_flag=0
 
 
@@ -89,7 +91,7 @@ timedatectl set-ntp true
 genfstab -U /mnt >> /mnt/etc/fstab
 
 #creating the base system
-pacstrap /mnt base-devel
+pacstrap /mnt base base-devel
 
 #copy necessary files to new root and continue install process
 cd arch-install-scripts
@@ -105,4 +107,5 @@ wait $1
 ##################################################################
 
 rm /mnt/build/build_scripts
+umount -a
 #unmount all and reboot
