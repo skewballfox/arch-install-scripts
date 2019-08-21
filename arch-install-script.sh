@@ -2,28 +2,23 @@
 ##################################################################
 
 skip_flag=0
+cont_flag=0
 EFI_Flag="empty"
-while [[ "$skip_flag" != 1 ]]
+while [[ $skip_flag != 1 ]]
 do
     read -p "Have the partitions already been set up?\n Type y(es) or n(o): " APart_Flag
-    if [[ "$APart_Flag" == "y" || "$APart_Flag" == "yes"]] 
-    then 
-        #skip automated partition management
-        if { -d /sys/firmware/efi/efivars} {
-                    read -p "will this system be EFI-based?/n Type y(es) or n(o): " EFI_Flag
-        } else {
-            EFI_Flag="no"
-        }
+    if [[ ${APart_Flag} == "y" ]] ||[[ ${APart_Flag} == "yes" ]] 
+    then
+        #skip all this shit if already managed     
         skip_flag=1
-
-    elif [[ "$APart_Flag" == "n" or "$APart_Flag" == "no" ]]
+    elif [[ ${APart_Flag} == "n" ]] || [[ ${APart_Flag} == "no" ]]
     then
         #begin automated partition management
         #####################################
-        while [[ $cont_flag!=1 ]]
+        while [[ $cont_flag != 1 ]]
         do
             read -p "Do you want to zero the drive?\n Type y(es) or n(o): " Zero_Flag
-            if [[ "$Zero_Flag" == "y" || "$Zero_Flag" == "yes" ]] 
+            if [[ ${Zero_Flag} == "y" ]] || [[ ${Zero_Flag} == "yes" ]] 
             then
                 #zero out the drives
                 ###################
@@ -32,7 +27,7 @@ do
                 
                 cont_flag=1
 
-            elif [[ "$Zero_Flag" == "n" or "$Zero_Flag" == "no" ]] 
+            elif [[ ${Zero_Flag} == "n" ]] || [[ ${Zero_Flag} == "no" ]] 
             then 
                 cont_flag=1
             else
@@ -40,6 +35,7 @@ do
             fi
         done
         cont_flag=0
+        echo 'beginning partition creation'
         while [[ $cont_flag!=1 ]]
         do
             # begin partiton creation
@@ -52,11 +48,9 @@ do
                     if [[ "$EFI_Flag" != "yes" && "$EFI_Flag" != "no" ]] 
                     then
                         EFI_Flag="empty"
-                
-                    else
-                    EFI_Flag="no"
                     fi
-
+                else
+                EFI_Flag="no"
                 fi
             done
 
@@ -82,7 +76,6 @@ do
         done
         # end partition creation
         ########################
-    done
     skip_flag=1
     #end automated partition management
     ###################################

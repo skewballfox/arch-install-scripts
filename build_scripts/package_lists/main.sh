@@ -87,3 +87,6 @@ build_main+=(gnupg pass browserpass-firefox browserpass-chromium)
 
 # for my zsh setup
 build_main+=(pkgfile zsh-completions zsh-syntax-highlighting zsh-theme-powerlevel9k)
+
+#android security stuff
+build_main+=(signify)

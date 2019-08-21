@@ -86,7 +86,7 @@ xdg-user-dir-update --set MUSIC $HOME/media/music
 xdg-user-dir-update --set TEMPLATES $HOME/workspace/templates
 
 #this makes java use system anti-aliased fonts and make swing use the GTK look and feel
-echo "export _JAVA_OPTIONS='-Dawt.useSystemAAFontSettings=on -Dswing.aatext=true -Dswing.defaultlaf=com.sun.java.swing.plaf.gtk.GTKLookAndFeel'" >> etc/profile.d/jre.sh
+sudo echo "export _JAVA_OPTIONS='-Dawt.useSystemAAFontSettings=on -Dswing.aatext=true -Dswing.defaultlaf=com.sun.java.swing.plaf.gtk.GTKLookAndFeel'" >> etc/profile.d/jre.sh
 
 ################# Setup Code ############################
 #########################################################
