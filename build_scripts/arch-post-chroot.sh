@@ -14,13 +14,13 @@ echo 'LANG=en_US.UTF-8' >>  etc/locale.conf
 loadkeys usr/share/kbd/keymaps/sun/sunt6-uk.map.gz
 echo 'KEYMAP=gb' >> etc/vconsole.conf
 
-
-read -p "Please enter a hostname: " HOSTNAME
+echo -n 'Please enter a hostname: '
+read HOSTNAME
 echo "$HOSTNAME" >> etc/hostname
 
-echo -e '127.0.0.1\t localhost' >> etc/hosts
-echo -e '::1\t localhost' >> etc/hosts
-echo -e '127.0.1.1\t labyrinth.localdomain\t labyrinth' >> etc/hosts
+echo -e '127.0.0.1\tlocalhost' >> etc/hosts
+echo -e '::1\tlocalhost' >> etc/hosts
+echo -e '127.0.1.1\tlabyrinth.localdomain\tlabyrinth' >> etc/hosts
 
 # the following lines detect if it is a laptop, then writes a file disabling
 # waking up if lid is opened.
@@ -28,7 +28,7 @@ echo -e '127.0.1.1\t labyrinth.localdomain\t labyrinth' >> etc/hosts
 
 read -r chassis_type < /sys/class/dmi/id/chassis_type
 
-if [[$chassis_type -eq 9]] || [[$chassis_type -eq 10]]; then
+if [[ ${chassis_type} -eq 9]] || [[ ${chassis_type} -eq 10]]; then
   echo 'w /proc/acpi/wakeup - - - - LID' >> etc/tmpfiles.d/disable-lid-wakeup.conf
 fi
 
@@ -64,13 +64,15 @@ wget -O etc/pacman.d/mirrorlist https://www.archlinux.org/mirrorlist/?country=US
 sed -i 's/^#Server/Server/' etc/pacman.d/mirrorlist
 
 #install a few necessary packages for rest of build
-pacman -Su grub os-prober firejail git chrony xorg-server sudo
+pacman -Su grub os-prober firejail git chrony xorg-server sudo linux-hardened linux-hardened-headers
 
 ################ Setup Bootloader #################################
 ###################################################################
 
 #TODO: wrap in if statement, have seperate setups for grub and rEFInd
 grub-install --target=i386-pc /dev/sda
+
+grub-mkconfig  -o boot/grub/grub.cfg
 
 #enable apparmor in kernel at boot
 sed -i '/GRUB_CMDLINE_LINUX/s/=""/="apparmor=1\ security=apparmor"' etc/default/grub
@@ -79,8 +81,28 @@ sed -i '/GRUB_CMDLINE_LINUX/s/=""/="apparmor=1\ security=apparmor"' etc/default/
 sed -i '/GRUB_DEFAULT/s/0/saved/' etc/default/grub 
 sed -i '/GRUB_SAVEDEFAULT/s/^#//' etc/default/grub
 
+mkdir etc/grub.d
 
+#password protect grub menu
+echo 'enter your desired grub password: '
+read grub_pwd
+echo grub_pwd >> meow
+echo grub_pwd >> meow
+
+grub_output="$(cat meow | grub-mkpasswd-pbkdf2 | awk '/grub.pbkdf/{print$NF}')"
+echo -e "set superusers=\"$USERNAME\"\npassword_pbkdf2 username $grub_output" >> etc/grub.d/40_custom
+
+rm meow
+
+#hide grub menu
+echo 'GRUB_FORCE_HIDDEN_MENU="true"' >> etc/default/grub
+mv build_scripts/31-hold-shift etc/grub.d/
+chmod a+x /etc/grub.d/31-hold-shift
 grub-mkconfig  -o boot/grub/grub.cfg
+
+#allow unrestricted booting of hardened kernel
+se="menuentry\ \'Arch Linux,\ with\ Linux\ linux-hardened\'"
+sed -i "s/$se/$se\ --unrestricted\ /" boot/grub/grub.cfg
 
 ######################### Install GPU drivers #####################
 ###################################################################
@@ -89,9 +111,9 @@ update-pciids
 
 vga_driver=$(lspci | grep 'vga\|3d\|2d')
 
-if [[ $vga_driver == *"Intel"* ]]; then
+if [[ ${vga_driver} == *"Intel"* ]]; then
     pacman -Syyu --noconfirm mesa lib32-mesa
-elif [[ $vga_driver == *"Nvidia"* ]]; then
+elif [[ ${vga_driver} == *"Nvidia"* ]]; then
     pacman -Syyu --noconfirm nvidia-dkms lib32-nvidia-utils nvidia-settings
 fi
 
@@ -100,9 +122,10 @@ fi
 ###################################################################
 
 #ask for username
-read -p "Please enter your username: " USERNAME
+echo 'Please enter your username: '
+read USERNAME
 #ask for password
-read -sp "Please enter your user password: " PWD
+#read -sp "Please enter your user password: " PWD
 
 #enable wheel
 sed -i '/%wheel\ ALL=(ALL)\ ALL/s/^#//' etc/sudoers
@@ -139,16 +162,29 @@ systemctl enable apparmor.service
 systemctl enable bluetooth.service
 systemctl enable gdm.service
 
+##################### NM Setup ##################################
+#################################################################
+
+echo -e '[main]\nwifi.cloned-mac-address=random' >> etc/NetworkManager/conf.d/mac_address_randomization.conf
+echo -e '[main]\ndhcp=dhclient' >> etc/NetworkManager/conf.d/dhcp-client.conf
+echo -e '[main]\ndns=dnsmasq' >> etc/NetworkManager/conf.d/dns.conf
+echo -e '[main]\nrc-manager=resolvconf' >> etc/NetworkManager/conf.d/rc-manager.conf
+echo -e 'conf-file=/usr/share/dnsmasq/trust-anchors.conf\ndnssec\nsystemd-resolved' >>
 #################### Harden System ##############################
 #################################################################
 
 chmod 700 boot etc/{iptables,arptables}
 sed -i "/umask"'s/^0022/0077//' etc/profile
 
+#hide processes from all users not part of proc group
+echo -e 'proc\t/proc\tproc\tnosuid,nodev,noexec,hidepid=2,gid=proc\t0\t0' >> etc/fstab
+echo -e '[Service]\nSupplementaryGroups=proc' >> etc/systemd/system/systemd-logind.service.d/hidepid.conf
 
 mv mnt/firejail_profiles/globals.local etc/firejail/globals.local
 #firejail apparmor integration
 apparmor_parser -r etc/apparmor.d/firejail-default
+
+
 
 #set user password here
 passwd $USERNAME

@@ -71,7 +71,7 @@ build_main+=(virtualbox-guest-dkms)
 build_main+=(pandoc texlive-core)
 
 #for interfacing with network and other devices
-build_main+=(networkmanager network-manager-applet blueman usbguard)
+build_main+=(networkmanager dhclient dnsmasq openresolv network-manager-applet blueman usbguard)
 
 #For browsing files and controlling USBs
 build_main+=(thunar ranger udiskie thunar-volman gvfs gparted ntfs-3g)
@@ -83,10 +83,10 @@ build_main+=(feh dunst conky conky-manager)
 build_main+=(scrot imagemagick wmctrl xautolock)
 
 #for improving password security
-build_main+=(gnupg pass browserpass-firefox browserpass-chromium)
+build_main+=(gnupg pass browserpass-firefox browserpass-chromium gnome-keyring libsecret seahorse)
 
 # for my zsh setup
 build_main+=(pkgfile zsh-completions zsh-syntax-highlighting zsh-theme-powerlevel9k)
 
-#android security stuff
-build_main+=(signify)
+#random security stuff
+build_main+=(signify paxtest)

@@ -1,0 +1,1 @@
+user_pip=(python-spinx ankipandas ankisync)

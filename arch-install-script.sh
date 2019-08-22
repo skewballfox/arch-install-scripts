@@ -50,6 +50,7 @@ do
                         EFI_Flag="empty"
                     fi
                 else
+                echo 'EFI is not supported on this system'
                 EFI_Flag="no"
                 fi
             done
@@ -70,6 +71,7 @@ do
             then
                 #Generate GPT partition setup
                 #############################
+                #parted -s -a optimal -- /dev/sda mkpart primary 1MiB -2048s
                 echo "coming back to this, not fully developed"
                 reboot
             fi
