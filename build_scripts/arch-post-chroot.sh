@@ -169,7 +169,8 @@ echo -e '[main]\nwifi.cloned-mac-address=random' >> etc/NetworkManager/conf.d/ma
 echo -e '[main]\ndhcp=dhclient' >> etc/NetworkManager/conf.d/dhcp-client.conf
 echo -e '[main]\ndns=dnsmasq' >> etc/NetworkManager/conf.d/dns.conf
 echo -e '[main]\nrc-manager=resolvconf' >> etc/NetworkManager/conf.d/rc-manager.conf
-echo -e 'conf-file=/usr/share/dnsmasq/trust-anchors.conf\ndnssec\nsystemd-resolved' >>
+echo -e 'conf-file=/usr/share/dnsmasq/trust-anchors.conf\ndnssec\n' >> etc/NetworkManager/conf.d/dnssec.conf
+
 #################### Harden System ##############################
 #################################################################
 
@@ -181,6 +182,7 @@ echo -e 'proc\t/proc\tproc\tnosuid,nodev,noexec,hidepid=2,gid=proc\t0\t0' >> etc
 echo -e '[Service]\nSupplementaryGroups=proc' >> etc/systemd/system/systemd-logind.service.d/hidepid.conf
 
 mv mnt/firejail_profiles/globals.local etc/firejail/globals.local
+
 #firejail apparmor integration
 apparmor_parser -r etc/apparmor.d/firejail-default
 

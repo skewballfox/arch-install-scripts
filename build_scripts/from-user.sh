@@ -63,6 +63,10 @@ yay -Sya --noconfirm --nocombinedupgrade --sudoloop ${build_aur[*]}
 # set up github to use pass
 git config --global credential.helper /usr/bin/pass-git-helper
 
+# install a couple of user python packages
+source package_lists/user_python_packages.sh
+pip install --user --upgrade ${user_pip[*]}
+
 #make directory so zathura can save bookmarks
 mkdir .local/share/zathura
 
@@ -87,11 +91,6 @@ xdg-user-dir-update --set TEMPLATES $HOME/workspace/templates
 
 #this makes java use system anti-aliased fonts and make swing use the GTK look and feel
 sudo echo "export _JAVA_OPTIONS='-Dawt.useSystemAAFontSettings=on -Dswing.aatext=true -Dswing.defaultlaf=com.sun.java.swing.plaf.gtk.GTKLookAndFeel'" >> etc/profile.d/jre.sh
-
-################# Setup Code ############################
-#########################################################
-code --install-extension ${code_setup[*]}
-#add git directory for firefox, set to setup firefox here
 
 #################### Setup Workspace ################################
 #####################################################################
