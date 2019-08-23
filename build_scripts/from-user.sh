@@ -17,6 +17,8 @@ config checkout -f
 
 config config --local status.showUntrackedFiles no
 
+echo -e 'pinentry-program /usr/bin/pinentry-gnome3'
+
 ############## Source package installers ###############
 ########################################################
 
@@ -42,14 +44,15 @@ rm -r powerpill
 #uncomment command write server list to file 
 #add server list to etc/powerpill/powerpill.json rsync server section
 reflector -p rsync -f 7 -l 7 >> temp 
-sed -i '/Server\ =/!d' temp
-sed -i 's/Server\ =\ //' temp
-sed -i 's/.*/"&"/' temp
-sed -i '$!s/$/,/' temp
-rslist=(cat temp)
-
+sed -e '/Server\ =/!d' temp
+sed -e 's/Server\ =\ //' temp
+sed -e 's/.*/"&"/' temp
+sed -e '$!s/$/,/' temp
+sed -e ':a;N;$!ba;s/\n//g' temp
+srst='"servers": ['
+rslist="$(cat temp)\]"
 #could never get the following line working
-#sudo sed -i '/"servers":/s/\[.*\]/[$rslist]/' etc/powerpill/powerpill.json
+sudo sed -e "/\"servers\":/s/\[]/[$rslist]/" etc/powerpill/powerpill.json
 
 
 ################### Install and setup Packages ###########
@@ -57,11 +60,12 @@ rslist=(cat temp)
 
 source package_lists/*
 
-sudo pacaur -Syyu --noconfirm ${build_main[*]}
+sudo powerpill -Syyu --noconfirm ${build_main[*]}
 yay -Sya --noconfirm --nocombinedupgrade --sudoloop ${build_aur[*]}
 
-# set up github to use pass
-git config --global credential.helper /usr/bin/pass-git-helper
+# set up github to use gnome-keyring
+git config --global credential.helper git config --global credential.helper /usr/lib/git-core/git-credential-libsecret
+
 
 # install a couple of user python packages
 source package_lists/user_python_packages.sh

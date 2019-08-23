@@ -90,4 +90,4 @@ build_main+=(gnupg pass browserpass-firefox browserpass-chromium gnome-keyring l
 build_main+=(pkgfile zsh-completions zsh-syntax-highlighting zsh-theme-powerlevel9k)
 
 #random security stuff
-build_main+=(signify paxtest)
+build_main+=(signify paxtest libsecret)
