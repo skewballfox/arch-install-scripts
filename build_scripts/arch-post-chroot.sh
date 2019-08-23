@@ -71,7 +71,7 @@ wget -O etc/pacman.d/mirrorlist https://www.archlinux.org/mirrorlist/?country=US
 sed -i 's/^#Server/Server/' etc/pacman.d/mirrorlist
 
 #install a few necessary packages for rest of build
-pacman -Su grub os-prober firejail git chrony xorg-server sudo linux-hardened linux-hardened-headers
+pacman -Su --no-confirm grub os-prober firejail git chrony xorg-server sudo linux-hardened linux-hardened-headers
 
 ################ Setup Bootloader #################################
 ###################################################################
@@ -192,15 +192,16 @@ sed -i "/umask"'s/^0022/0077//' etc/profile
 #hide processes from all users not part of proc group
 echo -e 'proc\t/proc\tproc\tnosuid,nodev,noexec,hidepid=2,gid=proc\t0\t0' >> etc/fstab
 
-# change log group to wheel in order to allow notifications
-sed -i "/log_group/s/root/wheel/" etc/audit/auditd.conf
+gpasswd -a gdm proc
 
 mkdir etc/systemd/system/systemd-logind.service.d
 echo -e '[Service]\nSupplementaryGroups=proc' >> etc/systemd/system/systemd-logind.service.d/hidepid.conf
 
-mv mnt/firejail_profiles/globals.local etc/firejail/globals.local
+# change log group to wheel in order to allow notifications
+sed -i "/log_group/s/root/wheel/" etc/audit/auditd.conf
 
-#firejail apparmor integration
+#firejail apparmor integration, disallow net globally
+mv mnt/firejail_profiles/globals.local etc/firejail/globals.local
 apparmor_parser -r etc/apparmor.d/firejail-default
 
 

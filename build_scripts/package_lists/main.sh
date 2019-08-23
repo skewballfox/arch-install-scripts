@@ -13,7 +13,7 @@ elif [[ $vga == *"Nvidia"* ]]; then
 fi
 
 # kernel stuff
-build_main+=(linux-hardened linux-zen linux-zen-headers linux-hardened-headers)
+build_main+=(linux-hardened linux-hardened-headers)
 build_main+=(crda usbctl asp apparmor)
 
 #just fonts
