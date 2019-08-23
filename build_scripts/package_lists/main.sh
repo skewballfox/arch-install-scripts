@@ -1,4 +1,4 @@
-build_main=(i3-wm xorg-xrdb)
+build_main=(i3-wm xorg-server xorg-xrdb chrony )
 
 #for session login, gdm is used for wayland xorg compatibility, gnome polkit is used for compatibility
 #right now just setting it up, but I may want to change the startup conf
@@ -13,7 +13,6 @@ elif [[ $vga == *"Nvidia"* ]]; then
 fi
 
 # kernel stuff
-build_main+=(linux-hardened linux-hardened-headers)
 build_main+=(crda usbctl asp apparmor)
 
 #just fonts
@@ -89,5 +88,5 @@ build_main+=(gnupg pass browserpass-firefox browserpass-chromium gnome-keyring l
 # for my zsh setup
 build_main+=(pkgfile zsh-completions zsh-syntax-highlighting zsh-theme-powerlevel9k)
 
-#random security stuff
-build_main+=(signify paxtest libsecret)
+#random security utilities
+build_main+=(signify paxtest libsecret firejail)

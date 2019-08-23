@@ -32,6 +32,7 @@ echo -e '127.0.1.1\tlabyrinth.localdomain\tlabyrinth' >> etc/hosts
 # the following lines detect if it is a laptop, then writes a file disabling
 # waking up if lid is opened.
 # NOTE: may need to find better, more consistent, option
+# NOTE: may use this to determine rest of the build process
 
 read -r chassis_type < /sys/class/dmi/id/chassis_type
 
@@ -69,9 +70,6 @@ rm -r pacman_hooks
 #update the mirrorlist
 wget -O etc/pacman.d/mirrorlist https://www.archlinux.org/mirrorlist/?country=US&protocol=https&ip_version=4&ip_version=6&use_mirror_status=on
 sed -i 's/^#Server/Server/' etc/pacman.d/mirrorlist
-
-#install a few necessary packages for rest of build
-pacman -Su --no-confirm grub os-prober firejail git chrony xorg-server sudo linux-hardened linux-hardened-headers
 
 ################ Setup Bootloader #################################
 ###################################################################

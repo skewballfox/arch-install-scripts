@@ -97,7 +97,9 @@ timedatectl set-ntp true
 genfstab -U /mnt >> /mnt/etc/fstab
 
 #creating the base system
-pacstrap /mnt base base-devel
+source /arch-install-scripts/build_scripts/package_lists/system_base.sh
+pacstrap /mnt ${base[*]}
+
 
 #copy necessary files to new root and continue install process
 cd arch-install-scripts
