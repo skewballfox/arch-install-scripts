@@ -72,6 +72,7 @@ build_main+=(pandoc texlive-core)
 
 #for interfacing with network and other devices
 build_main+=(networkmanager dhclient dnsmasq openresolv network-manager-applet blueman usbguard dnscrypt-proxy)
+build_main+=(ldns)
 
 #For browsing files and controlling USBs
 build_main+=(thunar ranger udiskie thunar-volman gvfs gparted ntfs-3g)

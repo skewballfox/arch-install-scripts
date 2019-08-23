@@ -163,9 +163,9 @@ echo -e '[main]\nwifi.cloned-mac-address=random' >> etc/NetworkManager/conf.d/ma
 echo -e '[main]\ndhcp=dhclient' >> etc/NetworkManager/conf.d/dhcp-client.conf
 echo -e '[main]\ndns=dnsmasq' >> etc/NetworkManager/conf.d/dns.conf
 echo -e '[main]\nrc-manager=resolvconf' >> etc/NetworkManager/conf.d/rc-manager.conf
-echo -e 'conf-file=/usr/share/dnsmasq/trust-anchors.conf\ndnssec\n' >> etc/NetworkManager/conf.d/dnssec.conf
-echo -e 'options="edns0 single-request-reopen"\nnameservers="::1 127.0.0.1"\ndnsmasq_conf=/etc/dnsmasq-openresolv.conf\ndnsmasq_resolv=/etc/dnsmasq-resolv.conf' >> etc/resolvconf.conf
-
+echo -e 'conf-file=/usr/share/dnsmasq/trust-anchors.conf\ndnssec\n' >> etc/NetworkManager/dnsmasq.d/dnssec.conf
+echo -e 'options="edns0 single-request-reopen"\nnameservers="::1 127.0.0.1"\ndnsmasq_conf=/etc/NetworkManager/dnsmasq.d/dnsmasq-openresolv.conf\ndnsmasq_resolv=/etc/NetworkManager/dnsmasq.d/dnsmasq-resolv.conf' >> etc/resolvconf.conf
+echo -e 'conf-file=/'
 sed -i '/require_dnssec/s/false/true/' etc/dnscrypt-proxy/dnscrypt-proxy.toml
 
 resolvconf -u
