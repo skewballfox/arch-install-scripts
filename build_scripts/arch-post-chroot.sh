@@ -130,7 +130,7 @@ read USERNAME
 #enable wheel
 sed -i '/%wheel\ ALL=(ALL)\ ALL/s/^#//' etc/sudoers
 
-useradd -m -G wheel,games -s bin/zsh $USERNAME
+useradd -m -G wheel,games,proc -s bin/zsh $USERNAME
 
 #mv necessary files/folders and change permissions
 mv -r package_lists home/$USERNAME/
@@ -151,6 +151,20 @@ rm -r home/$USERNAME/from-user.sh
 #disable root
 passwd -l root
 
+##################### NM Setup ##################################
+#################################################################
+
+echo -e '[main]\nwifi.cloned-mac-address=random' >> etc/NetworkManager/conf.d/mac_address_randomization.conf
+echo -e '[main]\ndhcp=dhclient' >> etc/NetworkManager/conf.d/dhcp-client.conf
+echo -e '[main]\ndns=dnsmasq' >> etc/NetworkManager/conf.d/dns.conf
+echo -e '[main]\nrc-manager=resolvconf' >> etc/NetworkManager/conf.d/rc-manager.conf
+echo -e 'conf-file=/usr/share/dnsmasq/trust-anchors.conf\ndnssec\n' >> etc/NetworkManager/conf.d/dnssec.conf
+echo -e 'nameserver ::1\nnameserver 127.0.0.1\noptions edns0 single-request-reopen' >> etc/resolvconf.conf
+
+sed -i '/require_dnssec/s/false/true/' >> etc/dnscrypt-proxy/dnscrypt-proxy.toml
+
+resolvconf -u
+
 ##################### Systemd Setup ###############################
 ###################################################################
 
@@ -162,14 +176,7 @@ systemctl enable apparmor.service
 systemctl enable bluetooth.service
 systemctl enable gdm.service
 
-##################### NM Setup ##################################
-#################################################################
-
-echo -e '[main]\nwifi.cloned-mac-address=random' >> etc/NetworkManager/conf.d/mac_address_randomization.conf
-echo -e '[main]\ndhcp=dhclient' >> etc/NetworkManager/conf.d/dhcp-client.conf
-echo -e '[main]\ndns=dnsmasq' >> etc/NetworkManager/conf.d/dns.conf
-echo -e '[main]\nrc-manager=resolvconf' >> etc/NetworkManager/conf.d/rc-manager.conf
-echo -e 'conf-file=/usr/share/dnsmasq/trust-anchors.conf\ndnssec\n' >> etc/NetworkManager/conf.d/dnssec.conf
+systemctl enable dnscrypt-proxy.service
 
 #################### Harden System ##############################
 #################################################################
