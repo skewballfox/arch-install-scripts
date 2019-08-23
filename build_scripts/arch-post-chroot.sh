@@ -159,9 +159,9 @@ echo -e '[main]\ndhcp=dhclient' >> etc/NetworkManager/conf.d/dhcp-client.conf
 echo -e '[main]\ndns=dnsmasq' >> etc/NetworkManager/conf.d/dns.conf
 echo -e '[main]\nrc-manager=resolvconf' >> etc/NetworkManager/conf.d/rc-manager.conf
 echo -e 'conf-file=/usr/share/dnsmasq/trust-anchors.conf\ndnssec\n' >> etc/NetworkManager/conf.d/dnssec.conf
-echo -e 'nameserver ::1\nnameserver 127.0.0.1\noptions edns0 single-request-reopen' >> etc/resolvconf.conf
+echo -e 'options="edns0 single-request-reopen"\nnameservers="::1 127.0.0.1"\n' >> etc/resolvconf.conf
 
-sed -i '/require_dnssec/s/false/true/' >> etc/dnscrypt-proxy/dnscrypt-proxy.toml
+sed -i '/require_dnssec/s/false/true/' etc/dnscrypt-proxy/dnscrypt-proxy.toml
 
 resolvconf -u
 
@@ -186,6 +186,7 @@ sed -i "/umask"'s/^0022/0077//' etc/profile
 
 #hide processes from all users not part of proc group
 echo -e 'proc\t/proc\tproc\tnosuid,nodev,noexec,hidepid=2,gid=proc\t0\t0' >> etc/fstab
+mkdir etc/systemd/system/systemd-logind.service.d
 echo -e '[Service]\nSupplementaryGroups=proc' >> etc/systemd/system/systemd-logind.service.d/hidepid.conf
 
 mv mnt/firejail_profiles/globals.local etc/firejail/globals.local
