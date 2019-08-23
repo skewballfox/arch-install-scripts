@@ -109,18 +109,6 @@ grub-mkconfig  -o boot/grub/grub.cfg
 se="menuentry\ \'Arch Linux,\ with\ Linux\ linux-hardened\'"
 sed -i "s/$se/$se\ --unrestricted\ /" boot/grub/grub.cfg
 
-######################### Install GPU drivers #####################
-###################################################################
-
-update-pciids
-
-vga_driver=$(lspci | grep 'vga\|3d\|2d')
-
-if [[ ${vga_driver} == *"Intel"* ]]; then
-    pacman -Syyu --noconfirm mesa lib32-mesa
-elif [[ ${vga_driver} == *"Nvidia"* ]]; then
-    pacman -Syyu --noconfirm nvidia-dkms lib32-nvidia-utils nvidia-settings
-fi
 
 
 ###################### Setup User and begin Build #################
