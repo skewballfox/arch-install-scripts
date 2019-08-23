@@ -75,20 +75,21 @@ xdg-mime default zathura.desktop application/pdf
 
 mkdir gdrive
 
-mkdir media
-mkdir media/pictures
-mkdir media/videos
-mkdir media/music
+mkdir Media
+mkdir Media/Photos
+mkdir Media/Videos
+mkdir Media/Music
 
 mkdir workspace
 mkdir workspace/templates
 
 xdg-user-dir-update --set DOCUMENTS $HOME/gdrive
-xdg-user-dir-update --set PICTURES $HOME/media/pictures
-xdg-user-dir-update --set VIDEOS $HOME/media/videos
-xdg-user-dir-update --set MUSIC $HOME/media/music
+xdg-user-dir-update --set PICTURES $HOME/Media/Photos
+xdg-user-dir-update --set VIDEOS $HOME/Media/Videos
+xdg-user-dir-update --set MUSIC $HOME/Media/Music
 xdg-user-dir-update --set TEMPLATES $HOME/workspace/templates
 
+mkdir $HOME/Media/Photos/Screenshots
 #this makes java use system anti-aliased fonts and make swing use the GTK look and feel
 sudo echo "export _JAVA_OPTIONS='-Dawt.useSystemAAFontSettings=on -Dswing.aatext=true -Dswing.defaultlaf=com.sun.java.swing.plaf.gtk.GTKLookAndFeel'" >> etc/profile.d/jre.sh
 

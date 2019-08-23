@@ -14,9 +14,16 @@ echo 'LANG=en_US.UTF-8' >>  etc/locale.conf
 loadkeys usr/share/kbd/keymaps/sun/sunt6-uk.map.gz
 echo 'KEYMAP=gb' >> etc/vconsole.conf
 
+#get user input
+
+#ask for hostname
 echo -n 'Please enter a hostname: '
 read HOSTNAME
 echo "$HOSTNAME" >> etc/hostname
+
+#ask for username
+echo 'Please enter your username: '
+read USERNAME
 
 echo -e '127.0.0.1\tlocalhost' >> etc/hosts
 echo -e '::1\tlocalhost' >> etc/hosts
@@ -121,15 +128,13 @@ fi
 ###################### Setup User and begin Build #################
 ###################################################################
 
-#ask for username
-echo 'Please enter your username: '
-read USERNAME
 #ask for password
 #read -sp "Please enter your user password: " PWD
 
 #enable wheel
 sed -i '/%wheel\ ALL=(ALL)\ ALL/s/^#//' etc/sudoers
 
+#create user and add them to necessary groups
 useradd -m -G wheel,games,proc -s bin/zsh $USERNAME
 
 #mv necessary files/folders and change permissions
@@ -159,7 +164,7 @@ echo -e '[main]\ndhcp=dhclient' >> etc/NetworkManager/conf.d/dhcp-client.conf
 echo -e '[main]\ndns=dnsmasq' >> etc/NetworkManager/conf.d/dns.conf
 echo -e '[main]\nrc-manager=resolvconf' >> etc/NetworkManager/conf.d/rc-manager.conf
 echo -e 'conf-file=/usr/share/dnsmasq/trust-anchors.conf\ndnssec\n' >> etc/NetworkManager/conf.d/dnssec.conf
-echo -e 'options="edns0 single-request-reopen"\nnameservers="::1 127.0.0.1"\n' >> etc/resolvconf.conf
+echo -e 'options="edns0 single-request-reopen"\nnameservers="::1 127.0.0.1"\ndnsmasq_conf=/etc/dnsmasq-openresolv.conf\ndnsmasq_resolv=/etc/dnsmasq-resolv.conf' >> etc/resolvconf.conf
 
 sed -i '/require_dnssec/s/false/true/' etc/dnscrypt-proxy/dnscrypt-proxy.toml
 
@@ -186,6 +191,10 @@ sed -i "/umask"'s/^0022/0077//' etc/profile
 
 #hide processes from all users not part of proc group
 echo -e 'proc\t/proc\tproc\tnosuid,nodev,noexec,hidepid=2,gid=proc\t0\t0' >> etc/fstab
+
+# change log group to wheel in order to allow notifications
+sed -i "/log_group/s/root/wheel/" etc/audit/auditd.conf
+
 mkdir etc/systemd/system/systemd-logind.service.d
 echo -e '[Service]\nSupplementaryGroups=proc' >> etc/systemd/system/systemd-logind.service.d/hidepid.conf
 
