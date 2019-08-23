@@ -25,7 +25,7 @@ build_main+=(zathura-ps zathura-cb playonlinux wine winetricks wine_gecko wine-m
 build_main+=(anki)
 
 #for linux magic
-build_main+=(tmux termite rxvt-unicode task zsh autocutsel wget unrar dialog arch-wiki-lite w3m)
+build_main+=(tmux termite rxvt-unicode task zsh autocutsel wget unrar dialog arch-wiki-lite arch-wiki-docs w3m)
 build_main+=(youtube-dl)
 
 #for coding
@@ -74,7 +74,7 @@ build_main+=(networkmanager dhclient dnsmasq openresolv network-manager-applet b
 build_main+=(ldns)
 
 #For browsing files and controlling USBs
-build_main+=(thunar ranger udiskie thunar-volman gvfs gparted ntfs-3g)
+build_main+=( ranger udiskie gvfs gparted ntfs-3g)
 
 #For desktop wallpaper, system notifications, and information display
 build_main+=(feh dunst conky conky-manager)
@@ -89,4 +89,7 @@ build_main+=(gnupg pass browserpass-firefox browserpass-chromium gnome-keyring l
 build_main+=(pkgfile zsh-completions zsh-syntax-highlighting zsh-theme-powerlevel9k)
 
 #random security utilities
-build_main+=(signify paxtest libsecret firejail)
+build_main+=( paxtest libsecret firejail)
+
+#android related stuff
+build_main+=(android-udev signify libmtp)
