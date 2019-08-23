@@ -1,11 +1,12 @@
 #!/bin/bash
+echo 'populating polkit rules'
 
-rules_location='/etc/polkit-1/rules.d/'
-current_directory=$(pwd)
+rules_location='etc/polkit-1/rules.d/'
 
-for file in $current_directory/*.rules; do
+
+for file in polkit_rules/*.rules; do
   if [[ $file != *"populator"* ]]; then
       base_file=$(echo $(basename "$file") )
-      sudo cp -i "$(pwd)/$base_file" $rules_location$base_file
+      cp -i "polkit_rules/$base_file" $rules_location$base_file
   fi
 done

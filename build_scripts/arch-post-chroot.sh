@@ -63,8 +63,8 @@ pacman-key --init
 pacman-key --populate archlinux
 
 # install pacman hooks
-source ./pacman_hooks/hook_populator.sh
-
+source pacman_hooks/hook_populator.sh
+rm -r pacman_hooks
 
 #update the mirrorlist
 wget -O etc/pacman.d/mirrorlist https://www.archlinux.org/mirrorlist/?country=US&protocol=https&ip_version=4&ip_version=6&use_mirror_status=on
@@ -165,10 +165,7 @@ echo -e '[main]\ndns=dnsmasq' >> etc/NetworkManager/conf.d/dns.conf
 echo -e '[main]\nrc-manager=resolvconf' >> etc/NetworkManager/conf.d/rc-manager.conf
 echo -e 'conf-file=/usr/share/dnsmasq/trust-anchors.conf\ndnssec\n' >> etc/NetworkManager/dnsmasq.d/dnssec.conf
 echo -e 'options="edns0 single-request-reopen"\nnameservers="::1 127.0.0.1"\ndnsmasq_conf=/etc/NetworkManager/dnsmasq.d/dnsmasq-openresolv.conf\ndnsmasq_resolv=/etc/NetworkManager/dnsmasq.d/dnsmasq-resolv.conf' >> etc/resolvconf.conf
-echo -e 'conf-file=/'
 sed -i '/require_dnssec/s/false/true/' etc/dnscrypt-proxy/dnscrypt-proxy.toml
-
-resolvconf -u
 
 ##################### Systemd Setup ###############################
 ###################################################################
@@ -186,7 +183,12 @@ systemctl enable dnscrypt-proxy.service
 #################### Harden System ##############################
 #################################################################
 
-chmod 700 boot etc/{iptables,arptables}
+#set up polkit rules for allowing certain functionality for user
+polkit_rules/polkit_populator.sh
+rm -r polkit rules
+
+#change default permissions 
+chmod 700 boot etc/{iptables,arptables} #NOTE: DESPERATELY NEED TO MAKE SIMPLE FIREWALLS
 sed -i "/umask"'s/^0022/0077//' etc/profile
 
 #hide processes from all users not part of proc group

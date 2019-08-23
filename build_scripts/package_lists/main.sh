@@ -49,7 +49,7 @@ build_main+=(python-mccabe python-pycodestyle python-pydocstyle python-rope)
 
 
 #for making i3 closer to a full fledged desktop environment
-build_main+=(xscreensaver compton dmenu redshift)
+build_main+=(xscreensaver compton dmenu redshift anyevent-i3 perl-json-xs)
 
 #for recording and editing editing video and image formats
 build_main+=(cheese blender gimp)
