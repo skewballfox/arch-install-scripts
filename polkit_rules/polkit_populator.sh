@@ -1,7 +1,7 @@
 #!/bin/bash
 echo 'populating polkit rules'
 
-rules_location='etc/polkit-1/rules.d/'
+rules_location='/etc/polkit-1/rules.d/'
 
 
 for file in polkit_rules/*.rules; do

@@ -1,7 +1,7 @@
 #!/bin/bash
 
 
-mkdir ~/virtual-machines
+mkdir ~/virtual_machines
 cd ~/virtual_machines
 
 wget -c https://download.freebsd.org/ftp/releases/amd64/amd64/ISO-IMAGES/12.0/FreeBSD-12.0-RELEASE-amd64-disc1.iso
@@ -13,7 +13,7 @@ VBoxManage storagectl FreeBSD --name "SATA Controller" --add sata \
 $ VBoxManage storageattach FreeBSD --storagectl "SATA Controller" --port 0 \
 >  --device 0 --type hdd --medium /VirtualBox/FreeBSD/FreeBSD.vdi
 
-VBoxManage storagectl $VM --name "IDE Controller" --add ide
+#VBoxManage storagectl $VM --name "IDE Controller" --add ide
 
-VBoxManage storageattach $VM --storagectl "IDE Controller" --port 0 \
->  --device 0 --type dvddrive --medium /path/to/windows_server_2008.iso
+#VBoxManage storageattach $VM --storagectl "IDE Controller" --port 0 \
+#>  --device 0 --type dvddrive --medium /path/to/windows_server_2008.iso

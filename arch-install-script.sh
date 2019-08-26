@@ -6,7 +6,8 @@ cont_flag=0
 EFI_Flag="empty"
 while [[ $skip_flag != 1 ]]
 do
-    read -p "Have the partitions already been set up?\n Type y(es) or n(o): " APart_Flag
+    echo -e "Have the partitions already been set up?\n Type y(es) or n(o): " 
+    read APart_Flag
     if [[ ${APart_Flag} == "y" ]] ||[[ ${APart_Flag} == "yes" ]] 
     then
         #skip all this shit if already managed     
@@ -17,14 +18,17 @@ do
         #####################################
         while [[ $cont_flag != 1 ]]
         do
-            read -p "Do you want to zero the drive?\n Type y(es) or n(o): " Zero_Flag
+            echo -e "Do you want to zero the drive?\n Type y(es) or n(o): " 
+            read Zero_Flag
             if [[ ${Zero_Flag} == "y" ]] || [[ ${Zero_Flag} == "yes" ]] 
             then
-                #zero out the drives
-                ###################
-                dd if=/dev/zero of=/dev/sda status=progress
-                dd if=/dev/zero of=/dev/sdb status=progress
+                #zero out the drives in parallel using calculated optimal block sizes
+                #####################################################################
                 
+                dd if=/dev/zero of=/dev/sda status=progress bs=128K &
+                dd if=/dev/zero of=/dev/sdb status=progress bs=256K &
+                wait
+
                 cont_flag=1
 
             elif [[ ${Zero_Flag} == "n" ]] || [[ ${Zero_Flag} == "no" ]] 
@@ -44,7 +48,8 @@ do
             do
                 if [ -d /sys/firmware/efi/efivars ] 
                 then
-                    read -p "EFI is supported, Do you want to Set it up?/n Type yes or no: " EFI_Flag
+                    echo -e "EFI is supported, Do you want to Set it up?/n Type yes or no: " 
+                    read EFI_Flag
                     if [[ "$EFI_Flag" != "yes" && "$EFI_Flag" != "no" ]] 
                     then
                         EFI_Flag="empty"
@@ -66,7 +71,9 @@ do
                 mount /dev/sda1 /mnt
                 mkdir /mnt/home
                 mount /dev/sdb1 /mnt/home
-            
+                
+                rm -r /arch-install-scripts/build_scripts/partition_setups
+
             elif [[ "$EFI_Flag" == "yes" ]]
             then
                 #Generate GPT partition setup
@@ -114,6 +121,5 @@ wait $1
 ######################### Clean up and reboot ####################
 ##################################################################
 
-rm /mnt/build/build_scripts
 umount -a
 #unmount all and reboot

@@ -27,7 +27,7 @@ read USERNAME
 
 echo -e '127.0.0.1\tlocalhost' >> etc/hosts
 echo -e '::1\tlocalhost' >> etc/hosts
-echo -e '127.0.1.1\tlabyrinth.localdomain\tlabyrinth' >> etc/hosts
+echo -e "127.0.1.1\t$HOSTNAME.localdomain\t$HOSTNAME" >> etc/hosts
 
 # the following lines detect if it is a laptop, then writes a file disabling
 # waking up if lid is opened.
@@ -39,8 +39,6 @@ read -r chassis_type < /sys/class/dmi/id/chassis_type
 if [[ ${chassis_type} -eq 9]] || [[ ${chassis_type} -eq 10]]; then
   echo 'w /proc/acpi/wakeup - - - - LID' >> etc/tmpfiles.d/disable-lid-wakeup.conf
 fi
-
-#need to add something for fstab
 
 ###########  Set pacman options  ##################################
 ###################################################################
@@ -114,8 +112,6 @@ sed -i "s/$se/$se\ --unrestricted\ /" boot/grub/grub.cfg
 ###################### Setup User and begin Build #################
 ###################################################################
 
-#ask for password
-#read -sp "Please enter your user password: " PWD
 
 #enable wheel
 sed -i '/%wheel\ ALL=(ALL)\ ALL/s/^#//' etc/sudoers
@@ -126,11 +122,18 @@ useradd -m -G wheel,games,proc -s bin/zsh $USERNAME
 #mv necessary files/folders and change permissions
 mv -r package_lists home/$USERNAME/
 mv from-user.sh home/$USERNAME/
+mv post-login.sh home/$USERNAME/
+mv vm-setup.sh home/$USERNAME/
 
 chown -R $USERNAME: home/$USERNAME/package_lists
 chown -R $USERNAME: home/$USERNAME/from-user.sh
+chown -R $USERNAME: home/$USERNAME/post-login.sh
+chown -R $USERNAME: home/$USERNAME/vm-setup.sh
+
 chmod -R u+rx home/$USERNAME/package_lists
-chomd -r u+rx home/$USERNAME/from-user.sh
+chmod -r u+rx home/$USERNAME/from-user.sh
+chmod -r u+rx home/$USERNAME/post-login.sh
+chmod -r u+rx home/$USERNAME/vm-setup.sh
 
 #call the build script from user
 su - $USERNAME -c home/$USERNAME/from-user.sh
@@ -142,58 +145,23 @@ rm -r home/$USERNAME/from-user.sh
 #disable root
 passwd -l root
 
-##################### NM Setup ##################################
-#################################################################
-
-echo -e '[main]\nwifi.cloned-mac-address=random' >> etc/NetworkManager/conf.d/mac_address_randomization.conf
-echo -e '[main]\ndhcp=dhclient' >> etc/NetworkManager/conf.d/dhcp-client.conf
-echo -e '[main]\ndns=dnsmasq' >> etc/NetworkManager/conf.d/dns.conf
-echo -e '[main]\nrc-manager=resolvconf' >> etc/NetworkManager/conf.d/rc-manager.conf
-echo -e 'conf-file=/usr/share/dnsmasq/trust-anchors.conf\ndnssec\n' >> etc/NetworkManager/dnsmasq.d/dnssec.conf
-echo -e 'options="edns0 single-request-reopen"\nnameservers="::1 127.0.0.1"\ndnsmasq_conf=/etc/NetworkManager/dnsmasq.d/dnsmasq-openresolv.conf\ndnsmasq_resolv=/etc/NetworkManager/dnsmasq.d/dnsmasq-resolv.conf' >> etc/resolvconf.conf
-sed -i '/require_dnssec/s/false/true/' etc/dnscrypt-proxy/dnscrypt-proxy.toml
+#set user password
+passwd $USERNAME
 
 ##################### Systemd Setup ###############################
 ###################################################################
+mv systemd_services/post-reboot.service etc/systemd/system/post-reboot.service
+rm -r systemd_services
+chmod +x build_scripts/post-reboot.sh
+
+systemctl daemon-reload
+systemctl enable post-reboot.service
 
 systemctl disable systemd-timesyncd.service
 systemctl enable chronyd.service
 
 systemctl enable apparmor.service
 
-systemctl enable bluetooth.service
-systemctl enable gdm.service
-
-systemctl enable dnscrypt-proxy.service
-
-#################### Harden System ##############################
-#################################################################
-
-#set up polkit rules for allowing certain functionality for user
-polkit_rules/polkit_populator.sh
-rm -r polkit rules
-
-#change default permissions 
-chmod 700 boot etc/{iptables,arptables} #NOTE: DESPERATELY NEED TO MAKE SIMPLE FIREWALLS
-sed -i "/umask"'s/^0022/0077//' etc/profile
-
-#hide processes from all users not part of proc group
-echo -e 'proc\t/proc\tproc\tnosuid,nodev,noexec,hidepid=2,gid=proc\t0\t0' >> etc/fstab
-
-gpasswd -a gdm proc
-
-mkdir etc/systemd/system/systemd-logind.service.d
-echo -e '[Service]\nSupplementaryGroups=proc' >> etc/systemd/system/systemd-logind.service.d/hidepid.conf
-
-# change log group to wheel in order to allow notifications
-sed -i "/log_group/s/root/wheel/" etc/audit/auditd.conf
-
-#firejail apparmor integration, disallow net globally
-mv mnt/firejail_profiles/globals.local etc/firejail/globals.local
-apparmor_parser -r etc/apparmor.d/firejail-default
 
 
-
-#set user password here
-passwd $USERNAME
 exit

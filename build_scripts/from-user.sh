@@ -17,7 +17,7 @@ config checkout -f
 
 config config --local status.showUntrackedFiles no
 
-echo -e 'pinentry-program /usr/bin/pinentry-gnome3'
+echo -e 'pinentry-program /usr/bin/pinentry-gnome3' >> $HOME/.gnupg/gpg-agent.conf
 
 ############## Source package installers ###############
 ########################################################
@@ -38,21 +38,18 @@ makepkg -sicL
 cd ~
 rm -r powerpill
 
-#test and add buarpill
-
-
 #uncomment command write server list to file 
 #add server list to etc/powerpill/powerpill.json rsync server section
-reflector -p rsync -f 7 -l 7 >> temp 
-sed -e '/Server\ =/!d' temp
-sed -e 's/Server\ =\ //' temp
-sed -e 's/.*/"&"/' temp
-sed -e '$!s/$/,/' temp
-sed -e ':a;N;$!ba;s/\n//g' temp
-srst='"servers": ['
-rslist="$(cat temp)\]"
+#reflector -p rsync -f 7 -l 7 >> temp 
+#sed -e '/Server\ =/!d' temp
+#sed -e 's/Server\ =\ //' temp
+#sed -e 's/.*/"&"/' temp
+#sed -e '$!s/$/,/' temp
+#sed -e ':a;N;$!ba;s/\n//g' temp
+
+#rslist="$(cat temp)"
 #could never get the following line working
-sudo sed -e "/\"servers\":/s/\[]/[$rslist]/" etc/powerpill/powerpill.json
+#sudo cat /etc/powerpill/powerpill.json | jq -s " .rsync.servers = [$rslist]" /etc/powerpill/powerpill.json
 
 
 ################### Install and setup Packages ###########
@@ -61,11 +58,10 @@ sudo sed -e "/\"servers\":/s/\[]/[$rslist]/" etc/powerpill/powerpill.json
 source package_lists/*
 
 sudo powerpill -Syyu --noconfirm ${build_main[*]}
-yay -Sya --noconfirm --nocombinedupgrade --sudoloop ${build_aur[*]}
 
-# set up github to use gnome-keyring
-git config --global credential.helper git config --global credential.helper /usr/lib/git-core/git-credential-libsecret
+yay -Sya --pacman powerpill --noconfirm --nocombinedupgrade --sudoloop ${build_aur[*]}
 
+yay -Sya --pacman powerpill --sudoloop
 
 # install a couple of user python packages
 source package_lists/user_python_packages.sh
@@ -84,23 +80,24 @@ mkdir Media/Photos
 mkdir Media/Videos
 mkdir Media/Music
 
-mkdir workspace
-mkdir workspace/templates
+mkdir Workspace
+mkdir Workspace/Templates
 
-xdg-user-dir-update --set DOCUMENTS $HOME/gdrive
+xdg-user-dir-update --set DOCUMENTS $HOME/Gdrive
 xdg-user-dir-update --set PICTURES $HOME/Media/Photos
 xdg-user-dir-update --set VIDEOS $HOME/Media/Videos
 xdg-user-dir-update --set MUSIC $HOME/Media/Music
-xdg-user-dir-update --set TEMPLATES $HOME/workspace/templates
+xdg-user-dir-update --set TEMPLATES $HOME/Workspace/Templates
 
 mkdir $HOME/Media/Photos/Screenshots
+
 #this makes java use system anti-aliased fonts and make swing use the GTK look and feel
 sudo echo "export _JAVA_OPTIONS='-Dawt.useSystemAAFontSettings=on -Dswing.aatext=true -Dswing.defaultlaf=com.sun.java.swing.plaf.gtk.GTKLookAndFeel'" >> etc/profile.d/jre.sh
 
 #################### Setup Workspace ################################
 #####################################################################
 
-cd workspace
+cd Workspace
 
 mkdir System_Tools
 mkdir Open_Source_Projects
@@ -111,6 +108,7 @@ source /package_lists/git_system_tools.sh
 
 cd writing_tools
 ./populate_systemd
+
 cd ..
 
 cd ../Open_Source_Projects

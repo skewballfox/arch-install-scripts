@@ -12,17 +12,15 @@ setup a few useful Virtual Machines
 
 Migrate to a custom Kernel
 
+mv optimal block size check into installer itself
+
+implement logging to catch possible errors and misteps
+
 Move all non-essential packages to main package list, and leave all essential packages in base package list
-
-consider baurerpill as an alternative to yay for aur upgrades
-
-segment this script into pieces to be executed before and after a reboot. 
-
-find a way to automatically launch second set of scripts after reboot completes
 
 look into and implement compilation flags for certain packages ( considering trying to get native performance for electron. )
 
-review and strip away on non-essential packages (low priority)
+review and move all non-essential packages from base to user script to improve install time (low priority)
 
 use tmux to daemonize termite
 

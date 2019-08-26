@@ -6,7 +6,7 @@ build_aur+=(i3lock-fancy-git oh-my-zsh-git otf-nerd-fonts-fira-code)
 # for interfacing with cloud services, messaging systems, and personal libraries
 build_aur+=(drive-bin buku bukubrow signal)
 # why isn't this in available via the official repositories?
-build_aur+=(rstudio-desktop-bin)
+build_aur+=(rstudio-desktop-git)
 # to check java style with kak
 build_aur+=(checkstyle)
 # system hardening
