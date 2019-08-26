@@ -7,12 +7,12 @@ git config --global credential.helper /usr/lib/git-core/git-credential-libsecret
 ################# Setup Firefox ##########################
 ##########################################################
 
-cp -R firefox-tweaks/chrome  ~/.mozilla/*firefox*/*.default/
+cp -R $HOME/Workspace/System_Tools/pandoras_box/firefox-tweaks/chrome  ~/.mozilla/*firefox*/*.default/
 
 ################# Setup Code ############################
 #########################################################
 
-source $HOME/workspace/System_Tools/arch-install-scripts/build_scripts/package_lists/code_oss.sh
+source $HOME/Workspace/System_Tools/arch-install-scripts/build_scripts/package_lists/code_oss.sh
 
 code --install-extension ${code_setup[*]}
 
@@ -21,7 +21,7 @@ code --install-extension ${code_setup[*]}
 
 
 
-drive init gdrive
+drive init Gdrive
 cd gdrive
 drive pull --quiet Classes
 drive pull --quiet .buku_db
@@ -34,7 +34,7 @@ cd ~
 
 
 mkdir .local/share/buku
-ln -s ~/gdrive/.buku_db/bookmarks.db ~/.local/share/buku/bookmarks.db
+ln -s ~/Gdrive/.buku_db/bookmarks.db ~/.local/share/buku/bookmarks.db
 
 ########################## Install Rust ############################
 ####################################################################
