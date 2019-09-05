@@ -1,7 +1,7 @@
 ################ Setup Host #######################################
 ###################################################################
 
-ln -sf usr/share/zoneinfo/US/Central etc/localtime
+ln -sf /usr/share/zoneinfo/US/Central /etc/localtime
 hwclock --systohc
 
 # definitely change this 
@@ -36,38 +36,20 @@ echo -e "127.0.1.1\t$HOSTNAME.localdomain\t$HOSTNAME" >> etc/hosts
 
 read -r chassis_type < /sys/class/dmi/id/chassis_type
 
-if [[ ${chassis_type} -eq 9]] || [[ ${chassis_type} -eq 10]]; then
+if [[ ${chassis_type} == 9 ]] || [[ ${chassis_type} == 10 ]]; then
   echo 'w /proc/acpi/wakeup - - - - LID' >> etc/tmpfiles.d/disable-lid-wakeup.conf
 fi
 
 ###########  Set pacman options  ##################################
 ###################################################################
 
-#enable color and candy
-sed -i '/Color/s/^#//' etc/pacman.conf
-sed -i '/Color/a ILoveCandy' etc/pacman.conf
-
-
-#enable multilib repository
-sed -i "/\[multilib\]/,/Include/"'s/^#//' etc/pacman.conf
-
-#set package signing option to require signature. 
-sed -i '/\[core\]/a SigLevel\ =\ PackageRequired' etc/pacman.conf
-sed -i '/\[multilib\]/a SigLevel\ =\ PackageRequired' etc/pacman.conf
-sed -i '/\[community\]/a SigLevel\ =\ PackageRequired' etc/pacman.conf
-sed -i '/\[extra\]/a SigLevel\ =\ PackageRequired' etc/pacman.conf
-
 #populate pacman keyring
 pacman-key --init
 pacman-key --populate archlinux
 
-# install pacman hooks
-source pacman_hooks/hook_populator.sh
-rm -r pacman_hooks
-
 #update the mirrorlist
-wget -O etc/pacman.d/mirrorlist https://www.archlinux.org/mirrorlist/?country=US&protocol=https&ip_version=4&ip_version=6&use_mirror_status=on
-sed -i 's/^#Server/Server/' etc/pacman.d/mirrorlist
+reflector --verbose --country 'US' -l 20 -p https --sort rate --save /etc/pacman.d/mirrorlist
+pacman -Syu 
 
 ################ Setup Bootloader #################################
 ###################################################################
@@ -78,7 +60,7 @@ grub-install --target=i386-pc /dev/sda
 grub-mkconfig  -o boot/grub/grub.cfg
 
 #enable apparmor in kernel at boot
-sed -i '/GRUB_CMDLINE_LINUX/s/=""/="apparmor=1\ security=apparmor"' etc/default/grub
+sed -i "/GRUB_CMDLINE_LINUX/s/=\"\"/=\"apparmor=1\ security=apparmor\"" etc/default/grub
 
 #Save last choice
 sed -i '/GRUB_DEFAULT/s/0/saved/' etc/default/grub 
@@ -104,14 +86,16 @@ chmod a+x /etc/grub.d/31-hold-shift
 grub-mkconfig  -o boot/grub/grub.cfg
 
 #allow unrestricted booting of hardened kernel
-se="menuentry\ \'Arch Linux,\ with\ Linux\ linux-hardened\'"
-sed -i "s/$se/$se\ --unrestricted\ /" boot/grub/grub.cfg
+se="menuentry\ \'Arch Linux'"
+sed -i "s/$se/$se\ --default\ --unrestricted\ /" boot/grub/grub.cfg
 
 
 
 ###################### Setup User and begin Build #################
 ###################################################################
 
+#so my zsh pacman hook will work
+mkdir var/cache/zsh
 
 #enable wheel
 sed -i '/%wheel\ ALL=(ALL)\ ALL/s/^#//' etc/sudoers

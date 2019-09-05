@@ -6,7 +6,7 @@ base+=( gcc-libs gettext glibc grep gzip inetutils iproute2 iputils jfsutils)
 base+=( less licenses linux-firmware logrotate lvm2 man-db man-pages mdadm)
 base+=( netctl pciutils perl procps-ng psmisc reiserfsprogs s-nail sed shadow)
 base+=( sysfsutils systemd-sysvcompat tar texinfo usbutils util-linux which)
-base+=( xfsprogs linux-hardened linux-hardened-headers kak git grub os-prober)
+base+=( xfsprogs linux-hardened linux-hardened-headers kakoune git grub os-prober)
 base+=( reflector )
 
 ######################### Install GPU drivers #####################
@@ -14,10 +14,11 @@ base+=( reflector )
 
 update-pciids
 
-vga_driver=$(lspci | grep 'vga\|3d\|2d')
+vga_driver=$(lspci | grep 'VGA\|3D\|2D')
 
 if [[ ${vga_driver} == *"Intel"* ]]; then
-    base+=( mesa lib32-mesa )
+    #if the vga driver is intel, assume integrated graphics
+    base+=( mesa intel-ucode)
 elif [[ ${vga_driver} == *"Nvidia"* ]]; then
-    base+=( nvidia-dkms lib32-nvidia-utils nvidia-settings )
+    base+=( nvidia-dkms nvidia-settings )
 fi

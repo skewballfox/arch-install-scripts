@@ -1,8 +1,6 @@
 ################ Setup git credentials #################
 ########################################################
 
-sudo pacman -S git
-
 git config --global user.email "joshua.ferguson.273@gmail.com"
 git config --global user.name "Joshua Ferguson"
 
@@ -30,22 +28,17 @@ makepkg -sicL
 cd ~
 rm -r yay
 
-#powerpill: what I want to move this script to in the future, for improved install speed
-
-git clone https://aur.archlinux.org/powerpill.git
-cd powerpill
-makepkg -sicL
-cd ~
-rm -r powerpill
+#easier than installing dependencies from source
+yay -S powerpill
 
 #uncomment command write server list to file 
 #add server list to etc/powerpill/powerpill.json rsync server section
-#reflector -p rsync -f 7 -l 7 >> temp 
-#sed -e '/Server\ =/!d' temp
-#sed -e 's/Server\ =\ //' temp
-#sed -e 's/.*/"&"/' temp
-#sed -e '$!s/$/,/' temp
-#sed -e ':a;N;$!ba;s/\n//g' temp
+reflector -p rsync -f 7 -l 7 >> temp 
+sed -e '/Server\ =/!d' temp
+sed -e 's/Server\ =\ //' temp
+sed -e 's/.*/"&"/' temp
+sed -e '$!s/$/,/' temp
+sed -e ':a;N;$!ba;s/\n//g' temp
 
 #rslist="$(cat temp)"
 #could never get the following line working
@@ -72,6 +65,8 @@ mkdir .local/share/zathura
 
 #set default directories and filetypes
 xdg-mime default zathura.desktop application/pdf
+xdg-mime default feh.desktop image/jpeg
+xdg-settings set default-web-browser firefox-developer-edition.desktop
 
 mkdir gdrive
 
@@ -83,16 +78,29 @@ mkdir Media/Music
 mkdir Workspace
 mkdir Workspace/Templates
 
-xdg-user-dir-update --set DOCUMENTS $HOME/Gdrive
-xdg-user-dir-update --set PICTURES $HOME/Media/Photos
-xdg-user-dir-update --set VIDEOS $HOME/Media/Videos
-xdg-user-dir-update --set MUSIC $HOME/Media/Music
-xdg-user-dir-update --set TEMPLATES $HOME/Workspace/Templates
+xdg-user-dirs-update --set DOCUMENTS $HOME/Gdrive
+xdg-user-dirs-update --set PICTURES $HOME/Media/Photos
+xdg-user-dirs-update --set VIDEOS $HOME/Media/Videos
+xdg-user-dirs-update --set MUSIC $HOME/Media/Music
+xdg-user-dirs-update --set TEMPLATES $HOME/Workspace/Templates
 
 mkdir $HOME/Media/Photos/Screenshots
 
 #this makes java use system anti-aliased fonts and make swing use the GTK look and feel
 sudo echo "export _JAVA_OPTIONS='-Dawt.useSystemAAFontSettings=on -Dswing.aatext=true -Dswing.defaultlaf=com.sun.java.swing.plaf.gtk.GTKLookAndFeel'" >> etc/profile.d/jre.sh
+
+############### Setup Dotfiles #########################
+########################################################
+
+echo ".cfg">> .gitignore
+alias config='git --git-dir=$HOME/.cfg/ --work-tree=$HOME'
+git clone --bare https://github.com/skewballfox/.cfg.git $HOME/.cfg 
+
+config checkout -f
+
+config config --local status.showUntrackedFiles no
+
+echo -e 'pinentry-program /usr/bin/pinentry-gnome3' >> $HOME/.gnupg/gpg-agent.conf
 
 #################### Setup Workspace ################################
 #####################################################################

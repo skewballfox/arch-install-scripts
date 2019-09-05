@@ -1,1 +1,1 @@
-user_pip=(python-spinx ankipandas ankisync)
+user_pip=(ankipandas ankisync)
