@@ -12,6 +12,9 @@ elif [[ $vga == *"Nvidia"* ]]; then
     build_main+=(xorg-xinit polkit polkit-gnome lib32-nvidia-utils)
 fi
 
+# for theming of gtk and Qt applications
+build_main+=(materia-gtk-theme kvantum-theme-materia)
+
 # kernel stuff
 build_main+=(crda usbctl asp apparmor)
 
@@ -20,9 +23,12 @@ build_main+=(ttf-font-awesome ttf-fira-code font-mathematica noto-fonts-cjk noto
 build_main+=(awesome-terminal-fonts)
 
 #common applications
-build_main+=(firefox-developer-edition chromium mpv qbittorrent caprine zathura zathura-pdf-mupdf mupdf-tools zathura-djvu)
-build_main+=(zathura-ps zathura-cb playonlinux wine winetricks wine_gecko wine-mono libreoffice-fresh)
+build_main+=(firefox-developer-edition chromium mpv zathura zathura-pdf-mupdf mupdf-tools zathura-djvu)
+build_main+=(zathura-ps zathura-cb libreoffice-fresh)
 build_main+=(anki)
+
+#For Gaming
+build_main+=(playonlinux wine winetricks wine_gecko wine-mono)
 
 #for linux magic
 build_main+=(tmux termite rxvt-unicode task zsh autocutsel wget unrar dialog arch-wiki-lite arch-wiki-docs w3m)
@@ -71,13 +77,13 @@ build_main+=(pandoc texlive-core)
 
 #for interfacing with network and other devices
 build_main+=(networkmanager dhclient dnsmasq openresolv network-manager-applet blueman usbguard dnscrypt-proxy)
-build_main+=(ldns)
+build_main+=(ldns) #switch from dnsmasq to unbound
 
 #For browsing files and controlling USBs
-build_main+=( ranger udiskie gvfs gparted ntfs-3g)
+build_main+=( ranger udiskie gvfs gparted ntfs-3g) #Clean out unnecessary package 
 
 #For desktop wallpaper, system notifications, and information display
-build_main+=(feh dunst conky conky-manager)
+build_main+=(feh dunst) #conky conky-manager
 
 #for screenshots and some locking
 build_main+=(scrot imagemagick wmctrl xautolock)
@@ -95,4 +101,4 @@ build_main+=( paxtest libsecret firejail)
 build_main+=(android-udev signify libmtp)
 
 #for social accounts
-build_main+=(pidgin purple-plugin-pack purple-facebook pidgin-otr)
+build_main+=(pidgin finch purple-plugin-pack purple-facebook pidgin-otr)

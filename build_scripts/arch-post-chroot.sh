@@ -134,7 +134,10 @@ passwd $USERNAME
 
 ##################### Systemd Setup ###############################
 ###################################################################
+
 mv systemd_services/post-reboot.service etc/systemd/system/post-reboot.service
+#sed -i "s/myuser/$USER/" /etc/systemd/system/pidgin-suspend.service  
+
 rm -r systemd_services
 chmod +x build_scripts/post-reboot.sh
 
