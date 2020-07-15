@@ -157,7 +157,7 @@ genfstab -U /mnt >> /mnt/etc/fstab
 
 #creating the base system
 source /arch-install-scripts/build_scripts/package_lists/system_base.sh
-pacstrap /mnt ${base[*]}
+#pacstrap /mnt ${base[*]}
 
 ########################## Get User input #######################
 #################################################################
