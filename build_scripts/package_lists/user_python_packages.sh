@@ -1,1 +1,0 @@
-user_pip=(ankipandas ankisync cookiecutter)

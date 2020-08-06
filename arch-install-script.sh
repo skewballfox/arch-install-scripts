@@ -1,168 +1,116 @@
 ########################### Get User Input #######################
 ##################################################################
+#loadkeys gb
+
 echo -e "Please enter the desired Hostname"
 read HOSTNAME
-echo $HOSTNAME
+echo HostName is $HOSTNAME
 
 echo -e "Please enter the desired Username"
 read USERNAME
-echo $USERNAME
+echo Username is $USERNAME
 
-########################### Partition management #################
-##################################################################
-
-skip_flag=0
-cont_flag=0
-EFI_Flag="empty"
 current_directory=$(pwd)
 
-while [[ $skip_flag != 1 ]]
-do
-    echo -e "Have the partitions already been set up?\n Type y(es) or n(o): " 
-    read APart_Flag
-    if [[ ${APart_Flag} == "y" ]] || [[ ${APart_Flag} == "yes" ]] 
-    then
-        #skip all this shit if already managed     
-        skip_flag=1
-    elif [[ ${APart_Flag} == "n" ]] || [[ ${APart_Flag} == "no" ]]
-    then
-        #begin automated partition management
-        #####################################
-        while [[ $cont_flag != 1 ]]
-        do
-            echo -e "Do you want to zero the drive?\n Type y(es) or n(o): " 
-            read Zero_Flag
-            if [[ ${Zero_Flag} == "y" ]] || [[ ${Zero_Flag} == "yes" ]] 
-            then
-                #zero out the drives in parallel using calculated optimal block sizes
-                #####################################################################
-                
-                dd if=/dev/zero of=/dev/sda status=progress bs=128K &
-                dd if=/dev/zero of=/dev/sdb status=progress bs=256K &
-                wait
+###########  Set pacman options  ##################################
+###################################################################
 
-                cont_flag=1
+echo -e 'setting pacman options\n\n'
 
-            elif [[ ${Zero_Flag} == "n" ]] || [[ ${Zero_Flag} == "no" ]] 
-            then 
-                cont_flag=1
-            else
-                echo "Response not understood, Please try again"
-            fi
-        done
-        cont_flag=0
-        echo 'beginning partition creation'
-        while [[ $cont_flag!=1 ]]
-        do
-            # begin partiton creation
-            #########################
-            while [[ $EFI_Flag == "empty" ]] 
-            do
-                if [ -d /sys/firmware/efi/efivars ] 
-                then
-                    echo -e "EFI is supported, Do you want to Set it up?/n Type yes or no: " 
-                    read EFI_Flag
-                    if [[ "$EFI_Flag" != "yes" && "$EFI_Flag" != "no" ]] 
-                    then
-                        EFI_Flag="empty"
-                    fi
-                else
-                echo 'EFI is not supported on this system'
-                EFI_Flag="no"
-                fi
-            done
+echo -e 'enabling color and candy\n\n'
 
-            if [[ "$EFI_Flag" == "no" ]] 
-            then
-                #Generate MBR partition setup
-                #############################
-                sfdisk /dev/sda < /arch-install-scripts/build_scripts/partition_setups/mbr_sda.sfdisk
-                sfdisk /dev/sdb < /arch-install-scripts/build_scripts/partition_setups/mbr_sdb.sfdisk
-                mkswap /dev/sdb2 
-                swapon /dev/sdb2
-                mount /dev/sda1 /mnt
-                mkdir /mnt/home
-                mount /dev/sdb1 /mnt/home
-                
-                rm -r /arch-install-scripts/build_scripts/partition_setups
-
-            elif [[ "$EFI_Flag" == "yes" ]]
-            then
-                #Generate GPT partition setup
-                #############################
-                #parted -s -a optimal -- /dev/sda mkpart primary 1MiB -2048s
-                echo "coming back to this, not fully developed"
-                reboot
-            fi
-        done
-        # end partition creation
-        ########################
-    skip_flag=1
-    #end automated partition management
-    ###################################
-    else 
-        echo "Response not understood, Please try again"
-    fi
-done
-
-cont_flag=0
-
-########################### Build powerpill ######################
-##################################################################
-
-# running makepkg as nobody user
-mkdir /home/build
-chgrp nobody /home/build
-chmod g+ws /home/build
-setfacl -m u::rwx,g::rwx /home/build
-setfacl -d --set u::rwx,g::rwx,o::- /home/build
-
-#enable color and candy
 sed -i '/Color/s/^#//' /etc/pacman.conf
 sed -i '/Color/a ILoveCandy' /etc/pacman.conf
 
-
-#enable multilib repository
+echo -e 'enabling multilib repository\n\n'
 sed -i "/\[multilib\]/,/Include/"'s/^#//' /etc/pacman.conf
 
-#set package signing option to require signature. 
+echo -e 'setting package signing option to require signature\n\n'
+
 sed -i '/\[core\]/a SigLevel\ =\ PackageRequired' /etc/pacman.conf
 sed -i '/\[multilib\]/a SigLevel\ =\ PackageRequired' /etc/pacman.conf
 sed -i '/\[community\]/a SigLevel\ =\ PackageRequired' /etc/pacman.conf
 sed -i '/\[extra\]/a SigLevel\ =\ PackageRequired' /etc/pacman.conf
 
-#enable xyne's repo
-echo -e "[xyne-x86_64]\n# A repo for Xyne's own projects: https://xyne.archlinux.ca/projects/\n# Packages for \"any\" architecture.\n# Use this repo only if there is no matching [xyne-*] repo for your architecture.\nSigLevel = Required\nInclude = /etc/pacman.d/xyne-mirrorlist"
-echo -e "Server = https://xyne.archlinux.ca/bin/repo.php?file=\nServer = https://xyne.mirrorrepo.com/repos/xyne" /etc/pacman.d/xyne-mirrorlist
+echo -e 'enable xynes repo'
 
-pacman -Sy powerpill baurerbill
+echo -e "[xyne-x86_64]\n# A repo for Xyne's own projects: https://xyne.archlinux.ca/projects/\n" >>/etc/pacman.conf
+echo -e '#Packages for the "x86_64" architecture.\n# Note that this includes all packages in [xyne-any].\nSigLevel = Required\nInclude = /etc/pacman.d/xyne-mirrorlist' >>/etc/pacman.conf
 
-#cd /home/build
-#git clone https://aur.archlinux.org/powerpill.git
-#chmod -R g+w powerpill
-#cd powerpill
-#sudo -u nobody makepkg -sicL --syncdeps
-#cd ..
-#rm -r powerpill
+# running makepkg as nobody user
+# mkdir /home/build
+# chgrp nobody /home/build
+# chmod g+ws /home/build
+# setfacl -m u::rwx,g::rwx /home/build
+# setfacl -d --set u::rwx,g::rwx,o::- /home/build
 
-#git clone  
+pacman -Sy powerpill
 
-cd $current_direcory
 ########################### Begin Install ########################
 ##################################################################
 
 timedatectl set-ntp true
 
-genfstab -U /mnt >> /mnt/etc/fstab
+genfstab -U /mnt >>/mnt/etc/fstab
 
-#creating the base system
+echo -e 'creating the base system\n\n'
+
 source /arch-install-scripts/build_scripts/package_lists/system_base.sh
-#pacstrap /mnt ${base[*]}
+./powerstrap /mnt ${base[*]}
 
-########################## Get User input #######################
-#################################################################
+echo -e 'copytng pacman configuration\n'
+cp /etc/pacman.conf /mnt/etc/pacman.conf
 
+echo -e 'setting hostname\n'
+echo "$HOSTNAME" >>/mnt/etc/hostname
 
+echo -e 'setting local host\n'
+
+echo -e '127.0.0.1\tlocalhost' >>/mnt/etc/hosts
+echo -e '::1\tlocalhost' >>/mnt/etc/hosts
+echo -e "127.0.1.1\t$HOSTNAME.localdomain\t$HOSTNAME" >>/mnt/etc/hosts
+
+echo -e 'enabling en_US.UTF-8 for localgen\n'
+sed -i '/#en_US.UTF-8\ UTF-8/s/^#//' /mnt/etc/locale.gen
+
+#enable wheel
+sed -i '/%wheel\ ALL=(ALL)\ ALL/s/^#//' /mnt/etc/sudoers
+
+#echo 'KEYMAP=gb' >> /mnt/etc/vconsole.conf
+
+########################## Configure Grub ########################
+##################################################################
+
+echo -e 'editing default grub\n'
+
+#enable apparmor in kernel at boot
+sed -i "/GRUB_CMDLINE_LINUX/s/=\"\"/=\"apparmor=1\ security=apparmor\"" /etc/default/grub
+
+#Save last choice
+sed -i '/GRUB_DEFAULT/s/0/saved/' /mnt/etc/default/grub
+sed -i '/GRUB_SAVEDEFAULT/s/^#//' /mnt/etc/default/grub
+
+#hide grub menu
+mkdir /mnt/etc/grub.d
+echo 'GRUB_FORCE_HIDDEN_MENU="true"' >>/mnt/etc/default/grub
+mv tools/31-hold-shift /mnt/etc/grub.d/
+chmod a+x /mnt/etc/grub.d/31-hold-shift
+
+#allow unrestricted booting of hardened kernel
+se="menuentry\ \'Arch Linux'"
+sed -i "s/$se/$se\ --default\ --unrestricted\ /" /mnt/etc/default/grub
+
+#password protect grub menu
+# disabling until I get the base stuff working, also may move to another confirmation method
+#echo 'enter your desired grub password: '
+#read grub_pwd
+#echo grub_pwd >> meow
+#echo grub_pwd >> meow
+
+#grub_output="$(cat meow | grub-mkpasswd-pbkdf2 | awk '/grub.pbkdf/{print$NF}')"
+#echo -e "set superusers=\"$USERNAME\"\npassword_pbkdf2 username $grub_output" >> etc/grub.d/40_custom
+
+# rm meow
 
 ######################### Populate pacman hooks #################
 #################################################################
@@ -175,96 +123,74 @@ mkdir -p $hooks_location
 vga_driver=$(lspci | grep 'vga\|3d\|2d')
 
 for file in $current_directory/pacman_hooks/*.hook; do
-  if [[ $file != *"populator"* ]]; then
-      base_file=$(echo $(basename "$file") )
-      if [[ $base_file != *"nvidia"* ]]; then
-        echo $base_file
-        cp -i "$current_directory/pacman_hooks/$base_file" "$hooks_location$base_file"
-      else
-        if [[ $vga_driver = *"Nvidia"* ]]; then
-          echo 'Nvidia GPU Detected, populating dkms-based hooks'
-          cp -i "pacman_hooks/$base_file" "$hooks_location$base_file"
+    if [[ $file != *"populator"* ]]; then
+        base_file=$(echo $(basename "$file"))
+        if [[ $base_file == *"nvidia"* ]]; then
+            if [[ ${vga_driver} == *"Nvidia"* ]]; then
+                echo -e "installing $base_file\n"
+                cp -i "$current_directory/pacman_hooks/$base_file" "$hooks_location$base_file"
+            else
+                echo -e "skipping $base_file because there is no nvidia gpu\n"
+            fi
+        else
+            echo -e "installing $base_file\n"
+            cp -i "$current_directory/pacman_hooks/$base_file" "$hooks_location$base_file"
         fi
-      fi
-  fi
+    fi
 done
 
-############################ polkit rules ##########################
-####################################################################
-echo 'populating polkit rules'
-
-rules_location='/mnt/etc/polkit-1/rules.d/'
-
-mkdir -p $rules_location
-
-for file in $current_direcory/polkit_rules/*.rules; do
-  if [[ $file != *"populator"* ]]; then
-      base_file=$(echo $(basename "$file") )
-      cp -i "polkit_rules/$base_file" $rules_location$base_file
-  fi
-done
-
-###########  Set pacman options  ##################################
+########################## setup Networking #######################
 ###################################################################
 
-#enable color and candy
-sed -i '/Color/s/^#//' /mnt/etc/pacman.conf
-sed -i '/Color/a ILoveCandy' /mnt/etc/pacman.conf
+echo -e 'setting up network manager\n\n'
+echo -e '[main]\nwifi.cloned-mac-address=random' >>/mnt/etc/NetworkManager/conf.d/mac_address_randomization.conf
+echo -e '[main]\ndhcp=dhclient' >>/mnt/etc/NetworkManager/conf.d/dhcp-client.conf
+echo -e '[main]\nrc-manager=resolvconf' >>/mnt/etc/NetworkManager/conf.d/rc-manager.conf
 
+echo -e 'setting up openreslver\n\n'
+#it seems that networkManager and unbound play better together when dns is set to None
+#echo -e '[main]\ndns=unbound' >>/mnt/etc/NetworkManager/conf.d/dns.conf
+echo -e 'name_servers="::1 127.0.0.1"' >>/mnt/etc/resolvconf.conf
+echo -e 'unbound_conf=/etc/unbound/resolvconf.conf' >>/mnt/etc/resolvconf.conf
+echo -e 'conf-file=/usr/share/dnsmasq/trust-anchors.conf\ndnssec\n' >>/mnt/etc/NetworkManager/dnsmasq.d/dnssec.conf
+echo -e 'options="edns0 single-request-reopen"\n' >>/mnt/etc/resolvconf.conf
 
-#enable multilib repository
-sed -i "/\[multilib\]/,/Include/"'s/^#//' /mnt/etc/pacman.conf
-
-#set package signing option to require signature. 
-sed -i '/\[core\]/a SigLevel\ =\ PackageRequired' /mnt/etc/pacman.conf
-sed -i '/\[multilib\]/a SigLevel\ =\ PackageRequired' /mnt/etc/pacman.conf
-sed -i '/\[community\]/a SigLevel\ =\ PackageRequired' /mnt/etc/pacman.conf
-sed -i '/\[extra\]/a SigLevel\ =\ PackageRequired' /mnt/etc/pacman.conf
-
-########################## setup Network Manager ##################
-###################################################################
-
-echo -e '[main]\nwifi.cloned-mac-address=random' >> /mnt/etc/NetworkManager/conf.d/mac_address_randomization.conf
-echo -e '[main]\ndhcp=dhclient' >> /mnt/etc/NetworkManager/conf.d/dhcp-client.conf
-echo -e '[main]\ndns=dnsmasq' >> /mnt/etc/NetworkManager/conf.d/dns.conf
-echo -e '[main]\nrc-manager=resolvconf' >> /mnt/etc/NetworkManager/conf.d/rc-manager.conf
-echo -e 'conf-file=/usr/share/dnsmasq/trust-anchors.conf\ndnssec\n' >> /mnt/etc/NetworkManager/dnsmasq.d/dnssec.conf
-echo -e 'options="edns0 single-request-reopen"\nnameservers="::1 127.0.0.1"\ndnsmasq_conf=/etc/NetworkManager/dnsmasq.d/dnsmasq-openresolv.conf\ndnsmasq_resolv=/etc/NetworkManager/dnsmasq.d/dnsmasq-resolv.conf' >> /mnt/etc/resolvconf.conf
+echo -e 'setting up local domain name resolution\n\n'
 sed -i '/require_dnssec/s/false/true/' /mnt/etc/dnscrypt-proxy/dnscrypt-proxy.toml
-
+echo -e "listen_addresses = ['127.0.0.1:53000', '[::1]:53000']\n" >>/mnt/dnscrypt-proxy.toml
+echo -e 'manually edit dnssec-conf. '
 #################### Harden System ##############################
 #################################################################
 
-#change default permissions 
+#change default permissions
 chmod 700 /mnt/boot /mnt/etc/{iptables,arptables} #NOTE: DESPERATELY NEED TO MAKE SIMPLE FIREWALLS
 sed -i "/umask"'s/^0022/0077//' /mnt/etc/profile
 
-#hide processes from all users not part of proc group
-echo -e 'proc\t/proc\tproc\tnosuid,nodev,noexec,hidepid=2,gid=proc\t0\t0' >> /mnt/etc/fstab
+echo -e 'hiding processes from all users not part of proc group\n\n'
+echo -e 'proc\t/proc\tproc\tnosuid,nodev,noexec,hidepid=2,gid=proc\t0\t0' >>/mnt/etc/fstab
 
 # gpasswd -a gdm proc
 
 mkdir -p /mnt/etc/systemd/system/systemd-logind.service.d
-echo -e '[Service]\nSupplementaryGroups=proc' >> /mnt/etc/systemd/system/systemd-logind.service.d/hidepid.conf
+echo -e '[Service]\nSupplementaryGroups=proc' >>/mnt/etc/systemd/system/systemd-logind.service.d/hidepid.conf
 
-# change log group to wheel in order to allow notifications
+#change log group to wheel in order to allow notifications
 sed -i "/log_group/s/root/wheel/" /mnt/etc/audit/auditd.conf
 
 #firejail apparmor integration, disallow net globally
 mkdir -p /mnt/etc/firejail
-mv $current_direcory/firejail_profiles/globals.local /mnt/etc/firejail/globals.local
+echo -e 'net none\napparmor' >>/mnt/etc/firejail/globals.local
 
-######################################################
+##################### Change root ################################
+##################################################################
 
 #copy necessary files to new root and continue install process
-cd arch-install-scripts
-cp -r build_scripts systemd_units /mnt
-cd ..
+cp tools/post-reboot.service /mnt/etc/systemd/system/post-reboot.service
+chmod +x /mnt/post-reboot.sh
 
 #begin install
 arch-chroot /mnt mnt/build_scripts/arch-post-chroot.sh
 wait $1
-
 
 ######################### Clean up and reboot ####################
 ##################################################################

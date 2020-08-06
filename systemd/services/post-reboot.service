@@ -1,9 +1,0 @@
-[Unit]
-Description=Finish up setup of system
-
-[Service]
-Type=simple
-ExecStart=/build_scripts/arch-post-reboot.sh
-
-[Install]
-WantedBy=multi-user.target

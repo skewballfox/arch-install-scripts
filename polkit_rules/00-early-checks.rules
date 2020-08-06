@@ -1,8 +1,0 @@
-/* Allow users in admin group to run GParted without authentication */
-polkit.addRule(function(action, subject)
-{
-    if (action.id == "org.archlinux.pkexec.gparted" &&
-        subject.user=="daedalus") {
-        return polkit.Result.YES;
-    }
-});

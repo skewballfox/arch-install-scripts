@@ -1,0 +1,24 @@
+# this is necessary to use openresolv with unbound
+#see https://wiki.archlinux.org/index.php/Unbound#Using_openresolv
+include: "/etc/unbound/resolvconf.conf"
+...
+server:
+...
+	private-domain: "intranet"
+	private-domain: "internal"
+	private-domain: "private"
+	private-domain: "corp"
+	private-domain: "home"
+	private-domain: "lan"
+
+	unblock-lan-zones: yes
+	insecure-lan-zones: yes
+...
+
+# this is necessary to 
+# see: https://wiki.archlinux.org/index.php/Dnscrypt-proxy#Unbound
+  do-not-query-localhost: no
+forward-zone:
+  name: "."
+  forward-addr: ::1@53000
+  forward-addr: 127.0.0.1@53000

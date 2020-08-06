@@ -1,7 +1,0 @@
-label: dos
-label-id: 0xc5250d65
-device: /dev/sdb
-unit: sectors
-
-/dev/sdb1 : start=        2048, size=   409600000, type=83
-/dev/sdb2 : start=   409602048, size=    51200000, type=82

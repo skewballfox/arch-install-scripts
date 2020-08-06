@@ -6,7 +6,7 @@ Type=Package
 Target=linux-hardened
 
 [Action]
-Description=Update Nvidia module in initcpio
+Description=reset the permissions for the boot directory after updating hardened kernel
 Depends=mkinitcpio
 When=PostTransaction
 Exec=/usr/bin/chmod 700 /boot
